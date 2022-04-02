@@ -276,7 +276,7 @@ void test_morpho_min_routine(int h, int w0)
     //display_ui8matrix(Y_ilu3_elu2rf,   0, h-1, 0, w0-1, "%5d", "Y ilu3 elu2rf");
 
 
-    puts("-- compare max --");
+    puts("-- compare min --");
     c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_reg        , "Y reg                       ");
     c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_rot        , "Y rot                       ");
     c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_red        , "Y red                       ");
@@ -284,7 +284,7 @@ void test_morpho_min_routine(int h, int w0)
     c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_ilu3r      , "Y ilu3 + red                ");
     c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_elu2r      , "Y elu2 + red                ");
     c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_elu2rf     , "Y ilu2 + red + factor       ");
-    c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_ilu3_elu2r, "Y ilu3 + elu2 + red         ");
+    c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_ilu3_elu2r , "Y ilu3 + elu2 + red          ");
     c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_ilu3_elu2rf, "Y ilu3 + elu2 + red + factor");
     putchar('\n');/**/
     //puts("done\n");
@@ -865,8 +865,8 @@ int test_morpho(int argc, char* argv[])
 // ====================================
 {
     puts("=== test_morpho ===");
-    puts("=== test_morpho max ===");
-    test_morpho_max();
+    //puts("=== test_morpho max ===");
+    //test_morpho_max();
     puts("=== test_morpho min ===");
     test_morpho_min(); //validés
     //test_morpho_ouverture();

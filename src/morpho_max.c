@@ -528,9 +528,10 @@ void line_max3_ui8matrix_ilu3_elu2_red_factor(uint8 **X, int i, int j0, int j1, 
     uint8 bas2_droit    = load2(X, i+2, j+1);
     //J
 
-
+    //--------------- commun  -----------
+    uint8 max_milieu_droit_bas_droit = min2(milieu_droit, bas_droit);
     //--------------- ligne 1 -----------
-    max_i1_droit  = max3(haut_droit, milieu_droit, bas_droit);
+    max_i1_droit  = max2(haut_droit, max_milieu_droit_bas_droit);
     max_i1 = max3(max_i1_gauche, max_i1_milieu, max_i1_droit);
     store2(Y, i, j, max_i1);
     //--------------- ligne 2 ------------
@@ -546,15 +547,18 @@ void line_max3_ui8matrix_ilu3_elu2_red_factor(uint8 **X, int i, int j0, int j1, 
     bas_gauche    = load2(X, i+1, j+2);
     bas2_gauche   = load2(X, i+2, j+2);
 
+    //--------------- commun  -----------
+    uint8 max_milieu_gauche_bas_gauche = min2(milieu_gauche, bas_gauche);
+
     //--------------- ligne 1 -----------
 
-    max_i1_gauche = max3(haut_gauche, milieu_gauche, bas_gauche);
+    max_i1_gauche = max2(haut_gauche, max_milieu_gauche_bas_gauche);
     max_i1 = max3(max_i1_gauche, max_i1_milieu, max_i1_droit);
     store2(Y, i, j_temp, max_i1);
     //--------------- ligne 2 ------------
     i_tmp = i+1;
 
-    max_i2_gauche = max3(milieu_gauche, bas_gauche, bas2_gauche);
+    max_i2_gauche = max2(max_milieu_gauche_bas_gauche, bas2_gauche);
     max_i2 = max3(max_i2_gauche, max_i2_milieu, max_i2_droit);
     store2(Y, i_tmp, j_temp, max_i2);
 
@@ -564,16 +568,18 @@ void line_max3_ui8matrix_ilu3_elu2_red_factor(uint8 **X, int i, int j0, int j1, 
     milieu_milieu = load2(X, i, j_temp+1);
     bas_milieu    = load2(X, i+1, j_temp+1);
     bas2_milieu   = load2(X, i+2, j_temp+1);
+    //--------------- commun  -----------
+    uint8 max_milieu_milieu_bas_milieu = min2(milieu_milieu, bas_milieu);
 
     //--------------- ligne 1 -----------
 
-    max_i1_milieu = max3(haut_milieu, milieu_milieu, bas_milieu);
+    max_i1_milieu = max2(haut_milieu, max_milieu_milieu_bas_milieu);
     max_i1 = max3(max_i1_gauche, max_i1_milieu, max_i1_droit);
     store2(Y, i, j_temp, max_i1);
     //--------------- ligne 2 ------------
     i_tmp = i+1;
 
-    max_i2_milieu = max3(milieu_milieu, bas_milieu, bas2_milieu);
+    max_i2_milieu = max2(max_milieu_milieu_bas_milieu, bas2_milieu);
     max_i2 = max3(max_i2_gauche, max_i2_milieu, max_i2_droit);
     store2(Y, i_tmp, j_temp, max_i2);
 

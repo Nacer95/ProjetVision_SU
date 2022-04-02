@@ -551,14 +551,15 @@ void line_min3_ui8matrix_ilu3_elu2_red_factor(uint8 **X, int i, int j0, int j1, 
     uint8 bas2_droit    = load2(X, i+2, j+1);
     //J
 
-
+    //--------------- commun  -----------
+    uint8 min_milieu_droit_bas_droit = min2(milieu_droit, bas_droit);
     //--------------- ligne 1 -----------
-    min_i1_droit  = min3(haut_droit, milieu_droit, bas_droit);
+    min_i1_droit  = min2(haut_droit, min_milieu_droit_bas_droit);
     min_i1 = min3(min_i1_gauche, min_i1_milieu, min_i1_droit);
     store2(Y, i, j, min_i1);
     //--------------- ligne 2 ------------
     i_tmp = i+1;
-    min_i2_droit  = min3(milieu_droit, bas_droit, bas2_droit);
+    min_i2_droit  = min2(min_milieu_droit_bas_droit, bas2_droit);
     min_i2 = min3(min_i2_gauche, min_i2_milieu, min_i2_droit);
     store2(Y, i_tmp, j, min_i2);
 
@@ -569,15 +570,18 @@ void line_min3_ui8matrix_ilu3_elu2_red_factor(uint8 **X, int i, int j0, int j1, 
     bas_gauche    = load2(X, i+1, j+2);
     bas2_gauche   = load2(X, i+2, j+2);
 
+    //--------------- commun  -----------
+    uint8 min_milieu_gauche_bas_gauche = min2(milieu_gauche, bas_gauche);
+
     //--------------- ligne 1 -----------
 
-    min_i1_gauche = min3(haut_gauche, milieu_gauche, bas_gauche);
+    min_i1_gauche = min2(haut_gauche, min_milieu_gauche_bas_gauche);
     min_i1 = min3(min_i1_gauche, min_i1_milieu, min_i1_droit);
     store2(Y, i, j_temp, min_i1);
     //--------------- ligne 2 ------------
     i_tmp = i+1;
 
-    min_i2_gauche = min3(milieu_gauche, bas_gauche, bas2_gauche);
+    min_i2_gauche = min2(min_milieu_gauche_bas_gauche, bas2_gauche);
     min_i2 = min3(min_i2_gauche, min_i2_milieu, min_i2_droit);
     store2(Y, i_tmp, j_temp, min_i2);
 
@@ -588,15 +592,18 @@ void line_min3_ui8matrix_ilu3_elu2_red_factor(uint8 **X, int i, int j0, int j1, 
     bas_milieu    = load2(X, i+1, j_temp+1);
     bas2_milieu   = load2(X, i+2, j_temp+1);
 
+    //--------------- commun  -----------
+    uint8 min_milieu_milieu_bas_milieu = min2(milieu_milieu, bas_milieu);
+
     //--------------- ligne 1 -----------
 
-    min_i1_milieu = min3(haut_milieu, milieu_milieu, bas_milieu);
+    min_i1_milieu = min2(haut_milieu, min_milieu_milieu_bas_milieu);
     min_i1 = min3(min_i1_gauche, min_i1_milieu, min_i1_droit);
     store2(Y, i, j_temp, min_i1);
     //--------------- ligne 2 ------------
     i_tmp = i+1;
 
-    min_i2_milieu = min3(milieu_milieu, bas_milieu, bas2_milieu);
+    min_i2_milieu = min2(min_milieu_milieu_bas_milieu, bas2_milieu);
     min_i2 = min3(min_i2_gauche, min_i2_milieu, min_i2_droit);
     store2(Y, i_tmp, j_temp, min_i2);
 
