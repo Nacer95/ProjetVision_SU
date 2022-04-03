@@ -10,6 +10,8 @@
 #ifndef __NRDEF_H__
 #define __NRDEF_H__
 
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#define MAX(a,b) (((a)>(b))?(a):(b))
 
 #define load1(X, i) X[i]
 #define load2(X, i, j) X[i][j]

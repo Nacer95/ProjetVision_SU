@@ -359,7 +359,7 @@ void line_max3_ui8matrix_elu2_red_factor(uint8 **X, int i, int j0, int j1, uint8
   uint8 haut_droit, milieu_droit, bas_droit, bas2_droit;
   int j, i_tmp, reste;
 
-  for(j=j0; j<j1; j++){
+  for(j=j0; j<=j1; j++){
     //printf("j=%d  j1 = %d , i=%d\n", j, j1, i);
 
     haut_droit    = load2(X, i-1, j+1);
@@ -529,7 +529,7 @@ void line_max3_ui8matrix_ilu3_elu2_red_factor(uint8 **X, int i, int j0, int j1, 
     //J
 
     //--------------- commun  -----------
-    uint8 max_milieu_droit_bas_droit = min2(milieu_droit, bas_droit);
+    uint8 max_milieu_droit_bas_droit = max2(milieu_droit, bas_droit);
     //--------------- ligne 1 -----------
     max_i1_droit  = max2(haut_droit, max_milieu_droit_bas_droit);
     max_i1 = max3(max_i1_gauche, max_i1_milieu, max_i1_droit);
@@ -548,7 +548,7 @@ void line_max3_ui8matrix_ilu3_elu2_red_factor(uint8 **X, int i, int j0, int j1, 
     bas2_gauche   = load2(X, i+2, j+2);
 
     //--------------- commun  -----------
-    uint8 max_milieu_gauche_bas_gauche = min2(milieu_gauche, bas_gauche);
+    uint8 max_milieu_gauche_bas_gauche = max2(milieu_gauche, bas_gauche);
 
     //--------------- ligne 1 -----------
 
@@ -569,7 +569,7 @@ void line_max3_ui8matrix_ilu3_elu2_red_factor(uint8 **X, int i, int j0, int j1, 
     bas_milieu    = load2(X, i+1, j_temp+1);
     bas2_milieu   = load2(X, i+2, j_temp+1);
     //--------------- commun  -----------
-    uint8 max_milieu_milieu_bas_milieu = min2(milieu_milieu, bas_milieu);
+    uint8 max_milieu_milieu_bas_milieu = max2(milieu_milieu, bas_milieu);
 
     //--------------- ligne 1 -----------
 
@@ -668,7 +668,7 @@ void max3_ui8matrix_elu2_red_factor(uint8 **X, int i0, int i1, int j0, int j1, u
   int reste = (i1-i0+1)%2;
   int i;
 
-  for ( i= i0; i< (i1-reste) ; i+=2){
+  for ( i= i0; i<= (i1-reste) ; i+=2){
     line_max3_ui8matrix_elu2_red(X, i, j0, j1, Y);
   }
   for (int r= i1-reste + 1; r <= i1; r++){ // Je garde cette boucle pour avoir une api générique

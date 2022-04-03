@@ -382,7 +382,7 @@ void line_min3_ui8matrix_elu2_red_factor(uint8 **X, int i, int j0, int j1, uint8
   uint8 haut_droit, milieu_droit, bas_droit, bas2_droit;
   int j, i_tmp, reste;
 
-  for(j=j0; j<j1; j++){
+  for(j=j0; j<=j1; j++){
     //printf("j=%d  j1 = %d , i=%d\n", j, j1, i);
 
     haut_droit    = load2(X, i-1, j+1);
