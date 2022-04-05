@@ -302,3 +302,24 @@ void line_min3_ui8matrix_ilu3(uint8 **X, int i, int j0, int j1, uint8 **Y)
     }
   }
 //+===================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+//EROSION
+// min_Col1 = min5(b1,     b6,             b8,         b10,    b12);
+// min_Col2 = min5(b2, haut_gauche, milieu_gauche, bas_gauche, b13);
+// min_Col3 = min5(b3, haut_milieu, milieu_milieu, bas_milieu, b14);
+// min_Col4 = min5(b4, haut_droit,  milieu_droit,  bas_droit,  b15);
+// min_Col5 = min5(b5,     b7,             b9,         b11,    b16);
+//
+// min_res = min5(min_Col1, min_Col2, min_Col3, min_Col4, min_Col5 );
