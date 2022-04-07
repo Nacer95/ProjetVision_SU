@@ -201,8 +201,6 @@ void line_ouverture3_ui8matrix_fusion_ilu5_red(uint8 **X, int i, int j0, int j1,
   reduction : réduire le nombre d'opération, minimiser le nombre de chargement d'information
 */
 {
-
-
   uint8 b1,     b2,       b3,       b4,         b5;
   uint8 b6,                                     b7;
   uint8 b8,                                     b9;
@@ -445,13 +443,14 @@ void line_ouverture3_ui8matrix_fusion_ilu5_red(uint8 **X, int i, int j0, int j1,
       la colonne milieu avec  m d (bd)
       d  g  m
 
-      g  m  d
+      g  m  d <- objectif
+      milieu <- gauche
+      gauche <- droit
+      droit  <- calculé au tour suivant
     */
 
     dilatation_c2 = dilatation_c1;
     dilatation_c1 = dilatation_c3 ;
-
-
 
   }// fin de la boucle for
 
@@ -464,6 +463,407 @@ void line_ouverture3_ui8matrix_fusion_ilu5_red(uint8 **X, int i, int j0, int j1,
 void line_ouverture3_ui8matrix_fusion_ilu5_elu2_red(uint8 **X, int i, int j0, int j1, uint8 **Y)
 // ---------------------------------------------------------------------------------------------
 {
+  printf("I=%d, i_traité=%d\n", i, i+1 );
+  uint8 b1,     b2,       b3,       b4,         b5;
+  uint8 b6,                                     b7;
+  uint8 b8,                                     b9;
+  uint8 b10,                                    b11;
+  uint8 b12,   b13,      b14,        b15,       b16;
+  uint8 b17,   b18,      b19,        b20,       b21;
+
+  uint8 haut_gauche,    haut_milieu,      haut_droit;
+  uint8 milieu_gauche,  milieu_milieu,    milieu_droit;
+  uint8 bas_gauche,     bas_milieu,       bas_droit;
+
+
+  b1 =load2(X, i-2, j0-2);      b2 =load2(X, i-2, j0-1);             b3 =load2(X, i-2, j0);             b4 =load2(X, i-2, j0+1);
+  b6 =load2(X, i-1, j0-2);
+  b8 =load2(X, i,   j0-2);
+  b10=load2(X, i+1, j0-2);
+  b12=load2(X, i+2, j0-2);      b13=load2(X, i+2, j0-1);            b14=load2(X, i+2, j0);             b15=load2(X, i+2, j0+1);
+  b17=load2(X, i+3, j0-2);      b18=load2(X, i+3, j0-1);            b19=load2(X, i+3, j0);             b20=load2(X, i+3, j0+1);
+
+                          haut_gauche  =load2(X, i-1, j0-1);    haut_milieu=load2(X, i-1, j0);      haut_droit=load2(X, i-1, j0+1);
+                          milieu_gauche=load2(X, i, j0-1);      milieu_milieu=load2(X, i, j0);      milieu_droit=load2(X, i, j0+1);
+                          bas_gauche   =load2(X, i+1, j0-1);    bas_milieu=load2(X, i+1, j0);       bas_droit=load2(X, i+1,  j0+1);
+
+
+
+  // Calcule des mins de la bordure gauche
+  uint8 min_bordure_gauche_haut   = min3(b1,  b6,  b8);
+  uint8 min_bordure_gauche_milieu = min3(b6,  b8,  b10);
+  uint8 min_bordure_gauche_bas    = min3(b8,  b10, b12);
+  uint8 min_bordure_gauche_bas2   = min3(b10, b12, b17);
+
+
+  // Calcule des mins de la colonne gauche
+  uint8 min_colonne_gauche_haut   = min3(b2,             haut_gauche,    milieu_gauche );
+  uint8 min_colonne_gauche_milieu = min3(haut_gauche,    milieu_gauche,  bas_gauche    );
+  uint8 min_colonne_gauche_bas    = min3(milieu_gauche,  bas_gauche,     b13           );
+  uint8 min_colonne_gauche_bas2   = min3(bas_gauche,     b13,            b18           );
+
+
+  // Calcule des mins de la colonne milieu
+  uint8 min_colonne_milieu_haut   = min3(b3,             haut_milieu,    milieu_milieu );
+  uint8 min_colonne_milieu_milieu = min3(haut_milieu,    milieu_milieu,  bas_milieu    );
+  uint8 min_colonne_milieu_bas    = min3(milieu_milieu,  bas_milieu,     b14           );
+  uint8 min_colonne_milieu_bas2   = min3(bas_milieu,     b14,            b19           );
+
+
+  // Calcule des mins de la colonne droite
+  uint8 min_colonne_droite_haut   = min3(b4,            haut_droit,     milieu_droit  );
+  uint8 min_colonne_droite_milieu = min3(haut_droit,    milieu_droit,   bas_droit     );
+  uint8 min_colonne_droite_bas    = min3(milieu_droit,  bas_droit,      b15           );
+  uint8 min_colonne_droite_bas2   = min3(bas_droit,     b15,            b20           );
+
+
+  // Calcul des mins de la bordure de droite
+  uint8 min_bordure_droite_haut;
+  uint8 min_bordure_droite_milieu;
+  uint8 min_bordure_droite_bas;
+  uint8 min_bordure_droite_bas2;
+
+
+
+  // Erosion ===================================================================
+  // COLONNE DE GAUCHE =========================================================
+  uint8 erosion_haut_gauche   = min3(min_bordure_gauche_haut,    min_colonne_gauche_haut,     min_colonne_milieu_haut);
+  uint8 erosion_milieu_gauche = min3(min_bordure_gauche_milieu,  min_colonne_gauche_milieu,   min_colonne_milieu_milieu);
+  uint8 erosion_bas_gauche    = min3(min_bordure_gauche_bas,     min_colonne_gauche_bas,      min_colonne_milieu_bas);
+  uint8 erosion_bas2_gauche   = min3(min_bordure_gauche_bas2,    min_colonne_gauche_bas2,     min_colonne_milieu_bas2);
+
+
+  // COLONNE DU MILIEU =========================================================
+  uint8 erosion_haut_milieu   = min3(min_colonne_gauche_haut,     min_colonne_milieu_haut,    min_colonne_droite_haut);
+  uint8 erosion_milieu_milieu = min3(min_colonne_gauche_milieu,   min_colonne_milieu_milieu,  min_colonne_droite_milieu);
+  uint8 erosion_bas_milieu    = min3(min_colonne_gauche_bas,      min_colonne_milieu_bas,     min_colonne_droite_bas);
+  uint8 erosion_bas2_milieu   = min3(min_colonne_gauche_bas2,     min_colonne_milieu_bas2,    min_colonne_droite_bas2);
+
+
+  // COLONNE DE DROITE =========================================================
+  uint8 erosion_haut_droit ;
+  uint8 erosion_milieu_droit ;
+  uint8 erosion_bas_droit;
+  uint8 erosion_bas2_droit;
+
+
+
+  //Dilatation de la colonne gauche et milieu pour i + 0  =================================
+  uint8 dilatation_c_gauche_p1 = max3(erosion_haut_gauche, erosion_milieu_gauche, erosion_bas_gauche);
+  uint8 dilatation_c_milieu_p1 = max3(erosion_haut_milieu, erosion_milieu_milieu, erosion_bas_milieu);
+  uint8 dilatation_c_droite_p1, dilatation_res_p1;
+
+  //Dilatation de la colonne gauche et milieu pour i + 1  =================================
+  uint8 dilatation_c_gauche_p2 = max3(erosion_milieu_gauche, erosion_bas_gauche, erosion_bas2_gauche);
+  uint8 dilatation_c_milieu_p2 = max3(erosion_milieu_milieu, erosion_bas_milieu, erosion_bas2_milieu);
+  uint8 dilatation_c_droite_p2, dilatation_res_p2;
+
+  int j_tmp, i_tmp;
+
+
+  int reste = (j1-j0+1)  % 5;
+  for (int j=j0; j<= j1-reste; j+=5){
+
+    //  =====================           J   +   0     ====================================================================================================================
+    //  =====================           i   +   0     =============================
+    /*
+      Charger la bordure de droite dans les variables de la bordure de droite
+      g m d
+    */
+    //============ LOAD ==================
+    b5 =load2(X, i-2, j+2);
+    b7 =load2(X, i-1, j+2);
+    b9 =load2(X, i,   j+2);
+    b11=load2(X, i+1, j+2);
+    b16=load2(X, i+2, j+2);
+    b21=load2(X, i+3, j+2);
+
+
+    min_bordure_droite_haut   = min3(b5,  b7, b9);
+    min_bordure_droite_milieu = min3(b7,  b9, b11);
+    min_bordure_droite_bas    = min3(b9,  b11, b16);
+    min_bordure_droite_bas2   = min3(b11, b16, b21);
+
+
+    erosion_haut_droit    = min3(min_colonne_milieu_haut,    min_colonne_droite_haut,    min_bordure_droite_haut);
+    erosion_milieu_droit  = min3(min_colonne_milieu_milieu,  min_colonne_droite_milieu,  min_bordure_droite_milieu);
+    erosion_bas_droit     = min3(min_colonne_milieu_bas,     min_colonne_droite_bas,     min_bordure_droite_bas);
+    erosion_bas2_droit    = min3(min_colonne_milieu_bas2,     min_colonne_droite_bas2,   min_bordure_droite_bas2);
+
+
+    //Dilatation du point i,j ==================
+    dilatation_c_droite_p1 = max3(erosion_haut_droit,  erosion_milieu_droit,  erosion_bas_droit);
+    dilatation_res_p1 = max3(dilatation_c_gauche_p1, dilatation_c_milieu_p1, dilatation_c_droite_p1);
+
+    //============ Store ==================
+    //Charger la valeur dans Y
+    store2(Y, i, j, dilatation_res_p1);
+
+
+    //  =====================           i   +   1     =============================
+    i_tmp = i+1;
+
+    //Dilatation du point i,j ==================
+    dilatation_c_droite_p2 = max3(erosion_milieu_droit,  erosion_bas_droit, erosion_bas2_droit);
+    dilatation_res_p2 = max3(dilatation_c_gauche_p2, dilatation_c_milieu_p2, dilatation_c_droite_p2);
+
+    //============ Store ==================
+    //Charger la valeur dans Y
+    store2(Y, i_tmp, j, dilatation_res_p2);
+
+
+    // //  =====================           J   +   1    ====================================================================================================================
+    /*
+    Charger la bordure de droite de j+1 dans les variables de la bordure de gauhce
+    et mettre à jour la colonne de gauche avec  d bd (bg)
+
+    m d g
+    */
+    //  =====================           i   +   0     =============================
+    j_tmp = j+1;
+
+    b1 =load2(X, i-2, j_tmp+2);
+    b6 =load2(X, i-1, j_tmp+2);
+    b8 =load2(X, i,   j_tmp+2);
+    b10=load2(X, i+1, j_tmp+2);
+    b12=load2(X, i+2, j_tmp+2);
+    b17=load2(X, i+3, j_tmp+2);
+
+
+    // Calcule des mins de la bordure gauche
+    min_bordure_gauche_haut   = min3(b1, b6,  b8);
+    min_bordure_gauche_milieu = min3(b6, b8,  b10);
+    min_bordure_gauche_bas    = min3(b8, b10, b12);
+    min_bordure_gauche_bas2   = min3(b10, b12, b17);
+
+
+    erosion_haut_gauche   = min3(min_colonne_droite_haut,   min_bordure_droite_haut,    min_bordure_gauche_haut);
+    erosion_milieu_gauche = min3(min_colonne_droite_milieu, min_bordure_droite_milieu,  min_bordure_gauche_milieu);
+    erosion_bas_gauche    = min3(min_colonne_droite_bas,    min_bordure_droite_bas,     min_bordure_gauche_bas);
+    erosion_bas2_gauche   = min3(min_colonne_droite_bas2,   min_bordure_droite_bas2,    min_bordure_gauche_bas2);
+
+
+    //Dilatation du point i,j ====================================================
+    dilatation_c_gauche_p1 = max3(erosion_haut_gauche, erosion_milieu_gauche, erosion_bas_gauche);
+    dilatation_res_p1 = max3(dilatation_c_gauche_p1, dilatation_c_milieu_p1, dilatation_c_droite_p1);
+
+    //============ Store ==================
+    //Charger la valeur dans Y
+    store2(Y, i, j_tmp, dilatation_res_p1);
+
+    // //  =====================           i   +   1    =============================
+    i_tmp = i+1;
+    //Dilatation du point i,j ====================================================
+    dilatation_c_gauche_p2 = max3(erosion_milieu_gauche, erosion_bas_gauche, erosion_bas2_gauche);
+    dilatation_res_p2 = max3(dilatation_c_gauche_p2, dilatation_c_milieu_p2, dilatation_c_droite_p2);
+
+    //============ Store ==================
+    //Charger la valeur dans Y
+    store2(Y, i_tmp, j_tmp, dilatation_res_p2);
+
+
+
+
+    // //  =====================           J   +   2     ====================================================================================================================
+    /*
+      Charger la bordure de droite de j+2 dans la colonne gauche et mettre à jour
+      la colonne milieu avec bd bg (g)
+      d g m
+    */
+    //  =====================           i   +   0     =============================
+    j_tmp = j+2;
+
+    b2            =load2(X, i-2, j_tmp+2);
+    haut_gauche   =load2(X, i-1, j_tmp+2);
+    milieu_gauche =load2(X, i,   j_tmp+2);
+    bas_gauche    =load2(X, i+1, j_tmp+2);
+    b13           =load2(X, i+2, j_tmp+2);
+    b18           =load2(X, i+3, j_tmp+2);
+
+
+    min_colonne_gauche_haut   = min3(b2,            haut_gauche,    milieu_gauche );
+    min_colonne_gauche_milieu = min3(haut_gauche,   milieu_gauche,  bas_gauche    );
+    min_colonne_gauche_bas    = min3(milieu_gauche, bas_gauche,     b13           );
+    min_colonne_gauche_bas2   = min3(bas_gauche,    b13,            b18           );
+
+
+
+    erosion_haut_milieu   = min3(min_bordure_droite_haut,    min_bordure_gauche_haut,     min_colonne_gauche_haut);
+    erosion_milieu_milieu = min3(min_bordure_droite_milieu,  min_bordure_gauche_milieu,   min_colonne_gauche_milieu);
+    erosion_bas_milieu    = min3(min_bordure_droite_bas,     min_bordure_gauche_bas,      min_colonne_gauche_bas);
+    erosion_bas2_milieu   = min3(min_bordure_droite_bas2,    min_bordure_gauche_bas2,     min_colonne_gauche_bas2);
+
+
+    //Dilatation du point i,j ====================================================
+    dilatation_c_milieu_p1 = max3(erosion_haut_milieu, erosion_milieu_milieu, erosion_bas_milieu);
+    dilatation_res_p1 = max3(dilatation_c_gauche_p1, dilatation_c_milieu_p1, dilatation_c_droite_p1);
+
+    //============ Store ==================
+    //Charger la valeur dans Y
+    store2(Y, i, j_tmp, dilatation_res_p1);
+
+    //  =====================           i   +    1     =============================
+    i_tmp = i+1;
+    //Dilatation du point i,j ====================================================
+    dilatation_c_milieu_p2 = max3(erosion_milieu_milieu, erosion_bas_milieu, erosion_bas2_milieu);
+    dilatation_res_p2 = max3(dilatation_c_gauche_p2, dilatation_c_milieu_p2, dilatation_c_droite_p2);
+
+    //============ Store ==================
+    //Charger la valeur dans Y
+    store2(Y, i_tmp, j_tmp, dilatation_res_p2);
+
+
+
+
+    // //  =====================           J   +   3     ====================================================================================================================
+    /*
+      Charger la bordure de droite de j+3 dans la colonne milieu et mettre à jour
+      la colonne droite avec bg g (m)
+
+      g m d
+    */
+    //  =====================           i   +    0     =============================
+
+    j_tmp = j+3;
+
+    b3            =load2(X, i-2, j_tmp+2);
+    haut_milieu   =load2(X, i-1, j_tmp+2);
+    milieu_milieu =load2(X, i,   j_tmp+2);
+    bas_milieu    =load2(X, i+1, j_tmp+2);
+    b14           =load2(X, i+2, j_tmp+2);
+    b19           =load2(X, i+3, j_tmp+2);
+
+
+    min_colonne_milieu_haut   = min3(b3,            haut_milieu,    milieu_milieu );
+    min_colonne_milieu_milieu = min3(haut_milieu,   milieu_milieu,  bas_milieu    );
+    min_colonne_milieu_bas    = min3(milieu_milieu, bas_milieu,     b14           );
+    min_colonne_milieu_bas2   = min3(bas_milieu,    b14,            b19           );
+
+
+    erosion_haut_droit    = min3(min_bordure_gauche_haut,      min_colonne_gauche_haut,     min_colonne_milieu_haut);
+    erosion_milieu_droit  = min3(min_bordure_gauche_milieu,    min_colonne_gauche_milieu,   min_colonne_milieu_milieu);
+    erosion_bas_droit     = min3(min_bordure_gauche_bas,       min_colonne_gauche_bas,      min_colonne_milieu_bas);
+    erosion_bas2_droit    = min3(min_bordure_gauche_bas2,      min_colonne_gauche_bas2,     min_colonne_milieu_bas2);
+
+
+    //Dilatation du point i,j ====================================================
+    dilatation_c_droite_p1 = max3(erosion_haut_droit,  erosion_milieu_droit,  erosion_bas_droit);
+    dilatation_res_p1 = max3(dilatation_c_gauche_p1, dilatation_c_milieu_p1, dilatation_c_droite_p1);
+
+    //============ Store ==================
+    //Charger la valeur dans Y
+    store2(Y, i, j_tmp, dilatation_res_p1);
+
+    //  =====================           i   +    1     =============================
+    i_tmp = i+1;
+    dilatation_c_droite_p2 = max3(erosion_milieu_droit,  erosion_bas_droit,  erosion_bas2_droit);
+    dilatation_res_p2 = max3(dilatation_c_gauche_p2, dilatation_c_milieu_p2, dilatation_c_droite_p2);
+
+    //============ Store ==================
+    //Charger la valeur dans Y
+    store2(Y, i_tmp, j_tmp, dilatation_res_p2);
+    // printf("j+4\n");
+
+
+
+    // //  =====================           J   +   4     ====================================================================================================================
+    /*
+      Charger la bordure de droite de j+4 dans la colonne droite et mettre à jour
+      la colonne gauche avec  g m (d)
+
+      m d g
+    */
+    //  =====================           i   +    0     =============================
+
+    j_tmp = j+4;
+    b4           =load2(X, i-2, j_tmp+2);
+    haut_droit   =load2(X, i-1, j_tmp+2);
+    milieu_droit =load2(X, i,   j_tmp+2);
+    bas_droit    =load2(X, i+1, j_tmp+2);
+    b15          =load2(X, i+2, j_tmp+2);
+    b20          =load2(X, i+3, j_tmp+2);
+
+
+
+    min_colonne_droite_haut   = min3(b4,            haut_droit,     milieu_droit  );
+    min_colonne_droite_milieu = min3(haut_droit,    milieu_droit,   bas_droit     );
+    min_colonne_droite_bas    = min3(milieu_droit,  bas_droit,      b15           );
+    min_colonne_droite_bas2   = min3(bas_droit,     b15,            b20           );
+
+
+    erosion_haut_gauche   = min3(min_colonne_gauche_haut,    min_colonne_milieu_haut,    min_colonne_droite_haut);
+    erosion_milieu_gauche = min3(min_colonne_gauche_milieu,  min_colonne_milieu_milieu,  min_colonne_droite_milieu);
+    erosion_bas_gauche    = min3(min_colonne_gauche_bas,     min_colonne_milieu_bas,     min_colonne_droite_bas);
+    erosion_bas2_gauche   = min3(min_colonne_gauche_bas2,    min_colonne_milieu_bas2,     min_colonne_droite_bas2);
+
+
+    //Dilatation du point i,j ====================================================
+    dilatation_c_gauche_p1 = max3(erosion_haut_gauche, erosion_milieu_gauche, erosion_bas_gauche);
+    dilatation_res_p1 = max3(dilatation_c_gauche_p1, dilatation_c_milieu_p1, dilatation_c_droite_p1);
+
+    //============ Store ==================
+    //Charger la valeur dans Y
+    store2(Y, i, j_tmp, dilatation_res_p1);
+
+    //  =====================           i   +    1     =============================
+    i_tmp = i+1;
+    dilatation_c_gauche_p2 = max3(erosion_milieu_gauche, erosion_bas_gauche, erosion_bas2_gauche);
+    dilatation_res_p2 = max3(dilatation_c_gauche_p2, dilatation_c_milieu_p2, dilatation_c_droite_p2);
+
+    //============ Store ==================
+    //Charger la valeur dans Y
+    store2(Y, i_tmp, j_tmp, dilatation_res_p2);
+
+
+
+    /*
+      Charger la bordure de droite de j+4 dans la bordure droite et mettre à jour
+      la colonne milieu avec  m d (bd)
+      d  g  m
+
+      g  m  d <- objectif
+      milieu <- gauche
+      gauche <- droit
+      droit  <- calculé au tour suivant
+    */
+    //p1
+    dilatation_c_milieu_p1 = dilatation_c_gauche_p1;
+    dilatation_c_gauche_p1 = dilatation_c_droite_p1 ;
+
+    //p2
+    dilatation_c_milieu_p2 = dilatation_c_gauche_p2;
+    dilatation_c_gauche_p2 = dilatation_c_droite_p2 ;
+
+
+
+  }// fin de la boucle for
+
+  // if (reste > 0){
+  //   line_ouverture3_ui8matrix_fusion(X, i,   j1-reste+1, j1, Y);
+  //
+  // }
+  // for (int r=j1-reste+1; r<=j1; r++){
+  //   for (int l= 0; l<eluX; l++){
+  //     line_ouverture3_ui8matrix_fusion(X, i+l, r, j1, Y);
+  //   }
+  // }
+
+  //printf("reste %d\n", reste);
+  // if (reste > 0){
+  //   printf("reste %d\n", reste);
+  //   line_ouverture3_ui8matrix_fusion(X, i,     j1-reste+1, j1, Y);
+  //   line_ouverture3_ui8matrix_fusion(X, i+1,   j1-reste+1, j1, Y);
+  // }
+  // printf("%d========\n",i );
+  // printf("fin\n");
+  if (reste > 0){
+    line_ouverture3_ui8matrix_fusion(X, i  , j1-reste+1, j1, Y);
+    line_ouverture3_ui8matrix_fusion(X, i+1, j1-reste+1, j1, Y);
+  }
+  // printf("fn2\n");
+
+
+
 
 }
 // ----------------------------------------------------------------------------------------------------
@@ -503,6 +903,16 @@ void ouverture3_ui8matrix_fusion_ilu5_red(uint8 **X, int i0, int i1, int j0, int
 void ouverture3_ui8matrix_fusion_ilu5_elu2_red(uint8 **X, int i0, int i1, int j0, int j1, uint8 **Y)
 // -------------------------------------------------------------------------------------------------
 {
+  int eluX = 2;
+  int reste = (i1-i0+1)%eluX;
+  int i;
+
+  for ( i= i0; i<= (i1-reste) ; i+=2){
+    line_ouverture3_ui8matrix_fusion_ilu5_elu2_red(X, i, j0, j1, Y);
+  }
+  for (int r=i1-reste+1; r <= i1; r++){ // Je garde cette boucle pour avoir une api générique
+    line_ouverture3_ui8matrix_fusion(X, r, j0, j1, Y );
+  }
 }
 // --------------------------------------------------------------------------------------------------------
 void ouverture3_ui8matrix_fusion_ilu5_elu2_red_factor(uint8 **X, int i0, int i1, int j0, int j1, uint8 **Y)

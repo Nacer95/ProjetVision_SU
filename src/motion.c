@@ -146,7 +146,7 @@ void motion_detection_morpho_v1(void)
     puts("[motion_detection_morpho_v1]: les parametres de la sequence sont dans motion.h");
     puts("[motion_detection_morpho_v1]: supprimer ce message une fois les parametres configures");
     puts("[motion_detection_morpho_v1]: bye...");
-    return;
+    //return;
 
     src_path = SEQUENCE_SRC_PATH;
     filename = SEQUENCE_FILENAME;
