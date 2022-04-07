@@ -323,3 +323,393 @@ void line_min3_ui8matrix_ilu3(uint8 **X, int i, int j0, int j1, uint8 **Y)
 // min_Col5 = min5(b5,     b7,             b9,         b11,    b16);
 //
 // min_res = min5(min_Col1, min_Col2, min_Col3, min_Col4, min_Col5 );
+
+
+
+
+
+
+
+
+
+
+
+
+void line_ouverture3_ui8matrix_fusion_red(uint8 **X, int i, int j0, int j1, uint8 **Y)
+// ----------------------------------------------------------------------------------------
+/*
+  reduction : réduire le nombre d'opération, minimiser le nombre de chargement d'information
+*/
+{
+  uint8 b1,     b2,       b3,       b4,         b5;
+  uint8 b6,                                     b7;
+  uint8 b8,                                     b9;
+  uint8 b10,                                    b11;
+  uint8 b12,   b13,      b14,        b15,       b16;
+
+  uint8 haut_gauche,    haut_milieu,      haut_droit;
+  uint8 milieu_gauche,  milieu_milieu,    milieu_droit;
+  uint8 bas_gauche,     bas_milieu,       bas_droit;
+
+  uint8 min_Col1, min_Col2, min_Col3, min_Col4, min_Col5;
+  uint8 min_res;
+
+
+  b1 =load2(X, i-2, j0-2);      b2 =load2(X, i-2, j0-1);     b3 =load2(X, i-2, j0);    b4 =load2(X, i-2, j0+1);
+  b6 =load2(X, i-1, j0-2);
+  b8 =load2(X, i,   j0-2);
+  b10=load2(X, i+1, j0-2);
+  b12=load2(X, i+2, j0-2);      b13=load2(X, i+2, j0-1);     b14=load2(X, i+2, j0);    b15=load2(X, i+2, j0+1);
+
+                      haut_gauche  =load2(X, i-1, j0-1);    haut_milieu=load2(X, i-1, j0);      haut_droit=load2(X, i-1, j0+1);
+                      milieu_gauche=load2(X, i, j0-1);      milieu_milieu=load2(X, i, j0);      milieu_droit=load2(X, i, j0+1);
+                      bas_gauche   =load2(X, i+1, j0-1);    bas_milieu=load2(X, i+1, j0);       bas_droit=load2(X, i+1,  j0+1);
+
+
+  // COLONNE DE GAUCHE =========================================================
+  // MAJ haut_gauche
+  uint8 haut_gauche_c1 = min3(b1, b6, b8);
+  uint8 haut_gauche_c2 = min3(b2, haut_gauche, milieu_gauche);
+  uint8 haut_gauche_c3 = min3(b3, haut_milieu, milieu_milieu);
+  uint8 erosion_haut_gauche = min3(haut_gauche_c1, haut_gauche_c2, haut_gauche_c3);
+
+  // MAJ milieu_gauche
+  uint8 milieu_gauche_c1 = min3(b6, b8, b10);
+  uint8 milieu_gauche_c2 = min3(haut_gauche, milieu_gauche, bas_gauche);
+  uint8 milieu_gauche_c3 = min3(haut_milieu, milieu_milieu, bas_milieu);
+  uint8 erosion_milieu_gauche = min3(milieu_gauche_c1, milieu_gauche_c2, milieu_gauche_c3);
+
+  //MAJ bas_gauche
+  uint8 bas_gauche_c1 = min3(b8, b10, b12);
+  uint8 bas_gauche_c2 = min3(milieu_gauche, bas_gauche, b13);
+  uint8 bas_gauche_c3 = min3(milieu_milieu, bas_milieu, b14);
+  uint8 erosion_bas_gauche = min3(bas_gauche_c1, bas_gauche_c2, bas_gauche_c3);
+
+
+  // COLONNE DU MILIEU =========================================================
+  // MAJ haut_milieu
+  uint8 haut_milieu_c1 = min3(b2, haut_gauche, milieu_gauche);
+  uint8 haut_milieu_c2 = min3(b3, haut_milieu, milieu_milieu);
+  uint8 haut_milieu_c3 = min3(b4, haut_droit,  milieu_droit);
+  uint8 erosion_haut_milieu = min3(haut_milieu_c1, haut_milieu_c2, haut_milieu_c3);
+
+  // MAJ milieu_milieu
+  uint8 milieu_milieu_c1 = min3(haut_gauche, milieu_gauche, bas_gauche);
+  uint8 milieu_milieu_c2 = min3(haut_milieu, milieu_milieu, bas_milieu);
+  uint8 milieu_milieu_c3 = min3(haut_droit,  milieu_droit , bas_droit);
+  uint8 erosion_milieu_milieu = min3(milieu_milieu_c1, milieu_milieu_c2, milieu_milieu_c3);
+
+  // MAJ bas_milieu
+  uint8 bas_milieu_c1 = min3(milieu_gauche, bas_gauche, b13);
+  uint8 bas_milieu_c2 = min3(milieu_milieu, bas_milieu, b14);
+  uint8 bas_milieu_c3 = min3(milieu_droit,  bas_droit,  b15);
+  uint8 erosion_bas_milieu = min3(bas_milieu_c1, bas_milieu_c2, bas_milieu_c3);
+
+
+  //Dilatation du point i,j
+  uint8 dilatation_c1 = max3(erosion_haut_gauche, erosion_milieu_gauche, erosion_bas_gauche);
+  uint8 dilatation_c2 = max3(erosion_haut_milieu, erosion_milieu_milieu, erosion_bas_milieu);
+  uint8 dilatation_c3, dilatation_res;
+
+  // COLONNE DROITE A VENIR ====================================================
+  // MAJ haut_droit
+  uint8 haut_droit_c1, haut_droit_c2 , haut_droit_c3, erosion_haut_droit;
+
+  // MAJ milieu_droit
+  uint8 milieu_droit_c1, milieu_droit_c2,  milieu_droit_c3, erosion_milieu_droit;
+
+  // MAJ bas_droit
+  uint8 bas_droit_c1, bas_droit_c2, bas_droit_c3, erosion_bas_droit;
+
+
+
+  for (int j=j0; j<= j1; j++){
+
+    //============ LOAD ==================
+    b5 =load2(X, i-2, j+2);
+    b7 =load2(X, i-1, j+2);
+    b9 =load2(X, i,   j+2);
+    b11=load2(X, i+1, j+2);
+    b16=load2(X, i+2, j+2);
+
+
+    // COLONNE DROITE ==========================================================
+    // MAJ haut_droit
+    haut_droit_c1 = min3(b3, haut_milieu, milieu_milieu);
+    haut_droit_c2 = min3(b4, haut_droit,  milieu_droit);
+    haut_droit_c3 = min3(b5, b7, b9);
+    erosion_haut_droit = min3(haut_droit_c1, haut_droit_c2, haut_droit_c3);
+
+    // MAJ milieu_droit
+    milieu_droit_c1 = min3(haut_milieu, milieu_milieu, bas_milieu);
+    milieu_droit_c2 = min3(haut_droit,  milieu_droit,  bas_droit);
+    milieu_droit_c3 = min3(b7, b9, b11);
+    erosion_milieu_droit = min3(milieu_droit_c1, milieu_droit_c2, milieu_droit_c3);
+
+    // MAJ bas_droit
+    bas_droit_c1 = min3(milieu_milieu, bas_milieu, b14);
+    bas_droit_c2 = min3(milieu_droit,  bas_droit,  b15);
+    bas_droit_c3 = min3(b9, b11, b16);
+    erosion_bas_droit = min3(bas_droit_c1, bas_droit_c2, bas_droit_c3);
+
+
+    //Dilatation du point i,j
+    dilatation_c3 = max3(erosion_haut_droit,  erosion_milieu_droit,  erosion_bas_droit);
+    dilatation_res = max3(dilatation_c1, dilatation_c2, dilatation_c3);
+
+    //============ Store ==================
+    //Charger la valeur dans Y
+    store2(Y, i, j, dilatation_res);
+
+
+    //========== permutation =============
+    //==========   EROSION   =============
+    //bordure gauche <- gauche
+    b1 = b2;
+    b6 = haut_gauche;
+    b8 = milieu_gauche;
+    b10 = bas_gauche;
+    b12 = b13;
+    //gauche <- milieu
+    b2 = b3;
+    haut_gauche = haut_milieu;
+    milieu_gauche = milieu_milieu;
+    bas_gauche = bas_milieu;
+    b13 = b14;
+
+    // milieu <- droite
+    b3 = b4;
+    haut_milieu = haut_droit;
+    milieu_milieu = milieu_droit;
+    bas_milieu = bas_droit;
+    b14 = b15;
+
+    // droite <- bordure droite
+    b4 = b5;
+    haut_droit = b7;
+    milieu_droit = b9;
+    bas_milieu = b11;
+    b15 = b16;
+
+    //==========  Dilatation =============
+    // gauche <- milieu
+    erosion_haut_gauche   = erosion_haut_milieu ;
+    erosion_milieu_gauche = erosion_milieu_milieu;
+    erosion_bas_gauche    = erosion_bas_milieu;
+
+    // milieu <- droit
+    erosion_haut_milieu   = erosion_haut_droit;
+    erosion_milieu_milieu = erosion_milieu_droit;
+    erosion_bas_milieu    = erosion_bas_droit;
+
+    //dilatation
+    dilatation_c1 = dilatation_c2;
+    dilatation_c2 = dilatation_c3;
+
+  }// fin de la boucle for
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // ----------------------------------------------------------------------------------------
+  void line_ouverture3_ui8matrix_fusion_red(uint8 **X, int i, int j0, int j1, uint8 **Y)
+  // ----------------------------------------------------------------------------------------
+  /*
+    reduction : réduire le nombre d'opération, minimiser le nombre de chargement d'information
+  */
+  {
+    uint8 b1,     b2,       b3,       b4,         b5;
+    uint8 b6,                                     b7;
+    uint8 b8,                                     b9;
+    uint8 b10,                                    b11;
+    uint8 b12,   b13,      b14,        b15,       b16;
+
+    uint8 haut_gauche,    haut_milieu,      haut_droit;
+    uint8 milieu_gauche,  milieu_milieu,    milieu_droit;
+    uint8 bas_gauche,     bas_milieu,       bas_droit;
+
+
+    b1 =load2(X, i-2, j0-2);      b2 =load2(X, i-2, j0-1);             b3 =load2(X, i-2, j0);             b4 =load2(X, i-2, j0+1);
+    b6 =load2(X, i-1, j0-2);
+    b8 =load2(X, i,   j0-2);
+    b10=load2(X, i+1, j0-2);
+    b12=load2(X, i+2, j0-2);      b13=load2(X, i+2, j0-1);            b14=load2(X, i+2, j0);             b15=load2(X, i+2, j0+1);
+
+                            haut_gauche  =load2(X, i-1, j0-1);    haut_milieu=load2(X, i-1, j0);      haut_droit=load2(X, i-1, j0+1);
+                            milieu_gauche=load2(X, i, j0-1);      milieu_milieu=load2(X, i, j0);      milieu_droit=load2(X, i, j0+1);
+                            bas_gauche   =load2(X, i+1, j0-1);    bas_milieu=load2(X, i+1, j0);       bas_droit=load2(X, i+1,  j0+1);
+
+
+    // COLONNE DE GAUCHE =========================================================
+    // MAJ haut_gauche
+    uint8 haut_gauche_c1 = min3(b1, b6, b8);
+    uint8 haut_gauche_c2 = min3(b2, haut_gauche, milieu_gauche);
+    uint8 haut_gauche_c3 = min3(b3, haut_milieu, milieu_milieu);
+    uint8 erosion_haut_gauche = min3(haut_gauche_c1, haut_gauche_c2, haut_gauche_c3);
+
+    // MAJ milieu_gauche
+    uint8 milieu_gauche_c1 = min3(b6, b8, b10);
+    uint8 milieu_gauche_c2 = min3(haut_gauche, milieu_gauche, bas_gauche);
+    uint8 milieu_gauche_c3 = min3(haut_milieu, milieu_milieu, bas_milieu);
+    uint8 erosion_milieu_gauche = min3(milieu_gauche_c1, milieu_gauche_c2, milieu_gauche_c3);
+
+    //MAJ bas_gauche
+    uint8 bas_gauche_c1 = min3(b8, b10, b12);
+    uint8 bas_gauche_c2 = min3(milieu_gauche, bas_gauche, b13);
+    uint8 bas_gauche_c3 = min3(milieu_milieu, bas_milieu, b14);
+    uint8 erosion_bas_gauche = min3(bas_gauche_c1, bas_gauche_c2, bas_gauche_c3);
+
+
+    // COLONNE DU MILIEU =========================================================
+    // MAJ haut_milieu
+    uint8 haut_milieu_c1 = min3(b2, haut_gauche, milieu_gauche);
+    uint8 haut_milieu_c2 = min3(b3, haut_milieu, milieu_milieu);
+    uint8 haut_milieu_c3 = min3(b4, haut_droit,  milieu_droit);
+    uint8 erosion_haut_milieu = min3(haut_milieu_c1, haut_milieu_c2, haut_milieu_c3);
+
+    // MAJ milieu_milieu
+    uint8 milieu_milieu_c1 = min3(haut_gauche, milieu_gauche, bas_gauche);
+    uint8 milieu_milieu_c2 = min3(haut_milieu, milieu_milieu, bas_milieu);
+    uint8 milieu_milieu_c3 = min3(haut_droit,  milieu_droit , bas_droit);
+    uint8 erosion_milieu_milieu = min3(milieu_milieu_c1, milieu_milieu_c2, milieu_milieu_c3);
+
+    // MAJ bas_milieu
+    uint8 bas_milieu_c1 = min3(milieu_gauche, bas_gauche, b13);
+    uint8 bas_milieu_c2 = min3(milieu_milieu, bas_milieu, b14);
+    uint8 bas_milieu_c3 = min3(milieu_droit,  bas_droit,  b15);
+    uint8 erosion_bas_milieu = min3(bas_milieu_c1, bas_milieu_c2, bas_milieu_c3);
+
+
+    //Dilatation du point i,j ====================================================
+    uint8 dilatation_c1 = max3(erosion_haut_gauche, erosion_milieu_gauche, erosion_bas_gauche);
+    uint8 dilatation_c2 = max3(erosion_haut_milieu, erosion_milieu_milieu, erosion_bas_milieu);
+    uint8 dilatation_c3, dilatation_res;
+
+    // COLONNE DROITE A VENIR ====================================================
+    // MAJ haut_droit
+    uint8 haut_droit_c1, haut_droit_c2 , haut_droit_c3, erosion_haut_droit;
+
+    // MAJ milieu_droit
+    uint8 milieu_droit_c1, milieu_droit_c2,  milieu_droit_c3, erosion_milieu_droit;
+
+    // MAJ bas_droit
+    uint8 bas_droit_c1, bas_droit_c2, bas_droit_c3, erosion_bas_droit;
+
+    int j_tmp;
+
+    int reste = (j1-j0)  % 5;
+    for (int j=j0; j<= j1; j+=1){
+
+      //  =====================           J   +   0     =============================
+      /*
+        Charger la bordure de droite dans les variables de la bordure de droite
+      */
+      //============ LOAD ==================
+      b5 =load2(X, i-2, j+2);
+      b7 =load2(X, i-1, j+2);
+      b9 =load2(X, i,   j+2);
+      b11=load2(X, i+1, j+2);
+      b16=load2(X, i+2, j+2);
+
+      // COLONNE DROITE ==========================================================
+      // MAJ haut_droit
+      haut_droit_c1 = min3(b3, haut_milieu, milieu_milieu);
+      haut_droit_c2 = min3(b4, haut_droit,  milieu_droit);
+      haut_droit_c3 = min3(b5, b7, b9);
+      erosion_haut_droit = min3(haut_droit_c1, haut_droit_c2, haut_droit_c3);
+
+      // MAJ milieu_droit
+      milieu_droit_c1 = min3(haut_milieu, milieu_milieu, bas_milieu);
+      milieu_droit_c2 = min3(haut_droit,  milieu_droit,  bas_droit);
+      milieu_droit_c3 = min3(b7, b9, b11);
+      erosion_milieu_droit = min3(milieu_droit_c1, milieu_droit_c2, milieu_droit_c3);
+
+      // MAJ bas_droit
+      bas_droit_c1 = min3(milieu_milieu, bas_milieu, b14);
+      bas_droit_c2 = min3(milieu_droit,  bas_droit,  b15);
+      bas_droit_c3 = min3(b9, b11, b16);
+      erosion_bas_droit = min3(bas_droit_c1, bas_droit_c2, bas_droit_c3);
+
+      //Dilatation du point i,j ====================================================
+      dilatation_c3 = max3(erosion_haut_droit,  erosion_milieu_droit,  erosion_bas_droit);
+      dilatation_res = max3(dilatation_c1, dilatation_c2, dilatation_c3);
+
+      //============ Store ==================
+      //Charger la valeur dans Y
+      store2(Y, i, j, dilatation_res);
+
+
+
+      //========== permutation =============
+      //==========   EROSION   =============
+      // bordure gauche <- gauche
+      b1 = b2;
+      b6 = haut_gauche;
+      b8 = milieu_gauche;
+      b10 = bas_gauche;
+      b12 = b13;
+
+      // gauche <- milieu
+      b2 = b3;
+      haut_gauche = haut_milieu;
+      milieu_gauche = milieu_milieu;
+      bas_gauche = bas_milieu;
+      b13 = b14;
+
+      //milieu <- droit
+      b3 = b4;
+      haut_milieu = haut_droit;
+      milieu_milieu = milieu_droit;
+      bas_milieu = bas_droit;
+      b14 = b15;
+
+      // droit <- bordure d
+      b4 = b5;
+      haut_droit=b7;
+      milieu_droit=b9;
+      bas_droit=b11;
+      b15=b16;
+
+      // //==========  Dilatation =============
+      // COLONNE DE GAUCHE =========================================================
+      // gauche <- milieu
+       erosion_haut_gauche = erosion_haut_milieu;
+       erosion_milieu_gauche = erosion_milieu_milieu;
+       erosion_bas_gauche = erosion_bas_milieu;
+
+      // COLONNE DU MILIEU =========================================================
+      // milieu <- droit
+       erosion_haut_milieu = erosion_haut_droit;
+       erosion_milieu_milieu = erosion_milieu_droit;
+       erosion_bas_milieu = erosion_bas_droit;
+
+
+      //Dilatation du point i,j ====================================================
+       dilatation_c1 = dilatation_c2;
+       dilatation_c2 = dilatation_c3;
+
+
+    }// fin de la boucle for
+
+    // if (reste >= 0){
+    //   line_ouverture3_ui8matrix_fusion(X, i, j1-reste+1, j1, Y);
+    // }
+
+  }
