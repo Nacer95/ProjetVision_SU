@@ -416,11 +416,11 @@ void test_morpho_ouverture_routine(int h, int w0)
     puts("--- fusion ---");
     puts("--------------");
 
-    // ouverture3_ui8matrix_fusion                     (X, 0, h-1, 0, w0-1,          Y_fusion                     );
-    // ouverture3_ui8matrix_fusion_ilu5_red            (X, 0, h-1, 0, w0-1,          Y_fusion_ilu5_red            );
+    ouverture3_ui8matrix_fusion                     (X, 0, h-1, 0, w0-1,          Y_fusion                     );
+    ouverture3_ui8matrix_fusion_ilu5_red            (X, 0, h-1, 0, w0-1,          Y_fusion_ilu5_red            );
     ouverture3_ui8matrix_fusion_ilu5_elu2_red         (X, 0, h-1, 0, w0-1,           Y_fusion_ilu5_elu2_red       );
-    // ouverture3_ui8matrix_fusion_ilu5_elu2_red_factor(X, 0, h-1, 0, w0-1,          Y_fusion_ilu5_elu2_red_factor);
-    // ouverture3_ui8matrix_fusion_ilu15_red           (X, 0, h-1, 0, w0-1,          Y_fusion_ilu15_red           );
+    ouverture3_ui8matrix_fusion_ilu5_elu2_red_factor(X, 0, h-1, 0, w0-1,          Y_fusion_ilu5_elu2_red_factor);
+    ouverture3_ui8matrix_fusion_ilu15_red           (X, 0, h-1, 0, w0-1,          Y_fusion_ilu15_red           );
 
     //display_ui8matrix(Y_basic                      ,  0, h-1, 0, w0-1, format1, "Y_basic                      ");
     //display_ui8matrix(Y_fusion                     ,  0, h-1, 0, w0-1, format1, "Y_fusion                     ");
@@ -429,11 +429,11 @@ void test_morpho_ouverture_routine(int h, int w0)
     //display_ui8matrix(Y_fusion_ilu5_elu2_red_factor,  0, h-1, 0, w0-1, format1, "Y_fusion_ilu5_elu2_red_factor");
     //display_ui8matrix(Y_fusion_ilu15_red           ,  0, h-1, 0, w0-1, format1, "Y_fusion_ilu15_red           ");
 
-    // c = compare_ui8matrix(Y_basic, 0, h-1, 0, w0-1, Y_fusion                     , "Y_fusion                     ");
-    // c = compare_ui8matrix(Y_basic, 0, h-1, 0, w0-1, Y_fusion_ilu5_red            , "Y_fusion_ilu5_red            ");
+    c = compare_ui8matrix(Y_basic, 0, h-1, 0, w0-1, Y_fusion                     , "Y_fusion                     ");
+    c = compare_ui8matrix(Y_basic, 0, h-1, 0, w0-1, Y_fusion_ilu5_red            , "Y_fusion_ilu5_red            ");
     c = compare_ui8matrix(Y_basic, 0, h-1, 0, w0-1, Y_fusion_ilu5_elu2_red       , "Y_fusion_ilu5_elu2_red       ");
-    // c = compare_ui8matrix(Y_basic, 0, h-1, 0, w0-1, Y_fusion_ilu5_elu2_red_factor, "Y_fusion_ilu5_elu2_red_factor");
-    // c = compare_ui8matrix(Y_basic, 0, h-1, 0, w0-1, Y_fusion_ilu15_red           , "Y_fusion_ilu15_red           ");
+    c = compare_ui8matrix(Y_basic, 0, h-1, 0, w0-1, Y_fusion_ilu5_elu2_red_factor, "Y_fusion_ilu5_elu2_red_factor");
+    c = compare_ui8matrix(Y_basic, 0, h-1, 0, w0-1, Y_fusion_ilu15_red           , "Y_fusion_ilu15_red           ");
 
     // puts("--------------");
     // puts("-- pipeline --");
@@ -442,11 +442,11 @@ void test_morpho_ouverture_routine(int h, int w0)
     // T: full-matrix
     // ouverture3_ui8matrix_pipeline_basic               (X, 0, h-1, 0, w0-1, T_pipeline                     , Y_pipeline                     );
     // ouverture3_ui8matrix_pipeline_red                 (X, 0, h-1, 0, w0-1, T_pipeline_red                 , Y_pipeline_red                 );
-    // ouverture3_ui8matrix_pipeline_ilu3_red            (X, 0, h-1, 0, w0-1, T_pipeline_ilu3_red            , Y_pipeline_ilu3_red            );
+    // // ouverture3_ui8matrix_pipeline_ilu3_red            (X, 0, h-1, 0, w0-1, T_pipeline_ilu3_red            , Y_pipeline_ilu3_red            );///P
     // ouverture3_ui8matrix_pipeline_elu2_red            (X, 0, h-1, 0, w0-1, T_pipeline_elu2_red            , Y_pipeline_elu2_red            );
-    // ouverture3_ui8matrix_pipeline_elu2_red_factor     (X, 0, h-1, 0, w0-1, T_pipeline_elu2_red_factor     , Y_pipeline_elu2_red_factor     );
+    // // ouverture3_ui8matrix_pipeline_elu2_red_factor     (X, 0, h-1, 0, w0-1, T_pipeline_elu2_red_factor     , Y_pipeline_elu2_red_factor     );//PPPP
     // ouverture3_ui8matrix_pipeline_ilu3_elu2_red       (X, 0, h-1, 0, w0-1, T_pipeline_ilu3_elu2_red       , Y_pipeline_ilu3_elu2_red       );
-    //ouverture3_ui8matrix_pipeline_ilu3_elu2_red_factor(X, 0, h-1, 0, w0-1, T_pipeline_ilu3_elu2_red_factor, Y_pipeline_ilu3_elu2_red_factor);
+    // ouverture3_ui8matrix_pipeline_ilu3_elu2_red_factor(X, 0, h-1, 0, w0-1, T_pipeline_ilu3_elu2_red_factor, Y_pipeline_ilu3_elu2_red_factor);
 
     //display_ui8matrix(X,                  0-2*r, h-1+2*r, 0-2*r, w0-1+2*r, format, "X +2r");
 
@@ -490,7 +490,7 @@ void test_morpho_ouverture_routine(int h, int w0)
     puts("-- free --");
     puts("----------");
 
-    free_ui8matrix(X , 0-2*r, h-1+2*r, 0-2*r, w1-1+2*r);
+    // free_ui8matrix(X , 0-2*r, h-1+2*r, 0-2*r, w1-1+2*r);
     // free_ui8matrix(X8, 0-2*r, h-1+2*r, 0-1*r, w8-1+1*r);
     // free_ui8matrix(X1, 0-2*r, h-1+2*r, 0-2*r, w1-1+2*r);
     //
@@ -510,51 +510,6 @@ void test_morpho_ouverture_routine(int h, int w0)
     puts("free done");
 }
 
-// ---------------------------------------
-void test_swp_routine(int h, int w0)
-// ---------------------------------------
-{
-  // avec des ADD
-  int r = 1; // rayon des operateurs
-  int w8 = w0 / 8; if(w0 % 8) w8 = w8+1;
-  int w1 = 8 * w8; // w1 >= w
-
-  puts("--------------------------------------------------");
-  printf("test_morpho_ouverture_routine h = %d w0 = %d w8 = %d, w1 = %d\n", h, w0, w8, w1);
-  if(w1 > w0) puts("w1 > w0");
-
-  uint8 **X;
-  uint8 **X8, **X1;
-
-
-  // Declartion des matrices
-  int c; // error
-
-  // format8 = "%3x";
-  // format1 = "%4d";
-  // format1 = "%2d";
-  //format1 = "%1d";
-
-  puts("malloc");
-  // X 2r-border
-  X      = ui8matrix(0-2*r, h-1+2*r, 0-2*r, w1-1+2*r);
-  X8     = ui8matrix(0-2*r, h-1+2*r, 0-1*r, w8-1+1*r);
-
-
-  //Allocation des matrices
-
-  //Initialisation des matrices à zero
-
-  //faire un random pour la matrice X
-
-  //appel des fonctions
-
-  //display
-
-  //compare
-
-
-}
 // -----------------------
 void test_morpho_max(void)
 // -----------------------
@@ -925,16 +880,16 @@ int test_morpho(int argc, char* argv[])
 {
     // puts("=== test_morpho ===");
     // puts("=== test_morpho max ===");
-    // test_morpho_max();
+    //test_morpho_max();
     // puts("=== test_morpho min ===");
-    // test_morpho_min(); //validés
-    //test_morpho_ouverture();
+    //test_morpho_min(); //validés
+    test_morpho_ouverture();
 
     //bench_morpho_ouverture(128, 512, 8);
     //bench_morpho_ouverture(128, 1024, 8);
 
     //test_set_str();
-    test_wikipedia();
+    //test_wikipedia();
 
   return 0;
 }
