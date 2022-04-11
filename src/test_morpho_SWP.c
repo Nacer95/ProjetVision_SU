@@ -352,7 +352,6 @@ void test_morpho_SWP_ouverture_routine(int h, int w0){
   //pack_ui8matrix(X, h, w1_8, Y8_rotation);
   // min3_ui8matrix_basic(X, -1, h, -1, w0, T_basic);
   // max3_ui8matrix_basic(X, 0, h-1, 0, w0-1, Y_basic);
-
   ouverture3_ui8matrix_basic(X, 0, h-1, 0, w0-1, T_basic,  Y_basic);
 
 
@@ -376,7 +375,7 @@ void test_morpho_SWP_ouverture_routine(int h, int w0){
 
   //compare Y
   c = compare_ui8matrix(Y_basic, 0, h-1, 0, w0-1, Y8_rotation_unpack                        , "Y8_rotation_unpack                       ");
-  
+
 
 
   //free
