@@ -40,18 +40,16 @@ extern "C" {
 // -----------------------------------
 #define macro_ui8left1(a, b) (a >> (8-1)) | (b << 1);
 #define macro_ui16left1(a, b) (a >> (16-1)) | (b << 1);
-
-// ---------------------------------------
-#define ui32left_macro(a, b) (a >> (32-1)) | (b << 1);
+#define macro_ui32left1(a, b) (a >> (32-1)) | (b << 1);
 
 // ------------------------------------
 #define macro_ui8right1(b, c) (b >> 1) | (c << (8-1));
 #define macro_ui16right1(b, c) (b >> 1) | (c << (16-1));
+#define macro_ui32right1(b, c) (b >> 1) | (c << (32-1));
 
-// ----------------------------------------
-#define ui32right_macro(b, c) (b >> 1) | (c << (32-1));
+#define mot_max3(a, b, c) (a | b | c) //OR  bit a bit
+#define mot_min3(a, b, c) (a & b & c) //AND bit a bit
 
-#define mot_max3(a, b, c) (a | b | c) //OR bit a bit
 
 
 uint8   ui8left( uint8 a,  uint8 b, int k);

@@ -274,13 +274,23 @@ void unpack_ui16vector(uint16* X16, int src_width, uint8* Y1)
 void unpack_ui32vector(uint32* X32, int src_width, uint8* Y1)
 // ----------------------------------------------------------
 {
+
+  if (Y1 == NULL)
+    {
+        printf("Échec de l'allocation unpack\n");
+        exit( EXIT_FAILURE);
+    }
+
     for(int i=0; i<src_width; i++) {
 
-        uint8 x = X32[i];
+        uint32 x = X32[i];
 
         for(int k=0; k<32; k++) {
+            // printf("k = %d e1 x=%d\n",k , x & 1);
             Y1[32*i + k] = x & 1;
+            // printf("k = %d e2\n",k  );
             x = x >> 1;
+            // printf("k = %d e3\n",k  );
         }
     }
 }
@@ -306,6 +316,10 @@ void pack_ui4vector(uint8* X1, int src_width, uint8* Y4)
 void pack_ui8vector(uint8* X1, int src_width, uint8* Y8)
 // -----------------------------------------------------
 {
+  /*
+    utilse si la plus petite taille transmise est < 8
+    int dst_width = src_width/8; if(src_width % 8) dst_width = dst_width+1;
+  */
     int dst_width = src_width/8;
 
     for(int i=0; i<dst_width; i++) {
@@ -324,11 +338,19 @@ void pack_ui8vector(uint8* X1, int src_width, uint8* Y8)
 void pack_ui16vector(uint8* X1, int src_width, uint16* Y16)
 // --------------------------------------------------------
 {
-    int dst_width = src_width/16;
-    printf("dst_width = %d\n",dst_width );
+    /*
+      int dst_width = src_width/16
+      retourne le quotient de la division euclidienne de src_width par 16
+      La matrice source doit obligatoirement être un multiple de 16
+      Je généralise la foncion pour des matrice de toute les taille
+
+      exemple src_width = 8
+      dst_width = src_width/16 => dst_width = 0
+      => on ne pack pas la matrice
+    */
+    int dst_width = src_width/16; if(src_width % 16) dst_width = dst_width+1;
 
     for(int i=0; i<dst_width; i++) {
-
 
         uint16 x = 0;
 
@@ -338,22 +360,23 @@ void pack_ui16vector(uint8* X1, int src_width, uint16* Y16)
             x = x | (b << k);
         }
         Y16[i] = x;
-        if (i == 1){ printf(" 2 %d\n",x );}
+
+        // if (i == 1){ printf(" 2 %d\n",x );}
     }
 }
 // --------------------------------------------------------
 void pack_ui32vector(uint8* X1, int src_width, uint32* Y32)
 // --------------------------------------------------------
 {
-    int dst_width = src_width/32;
+    int dst_width = src_width/32; if(src_width % 32) dst_width = dst_width+1;
 
     for(int i=0; i<dst_width; i++) {
 
-        uint8 x = 0;
+        uint32 x = 0;
 
         for(int k=0; k<32; k++) {
 
-            uint8 b = X1[32*i + k];
+            uint32 b = X1[32*i + k];
             x = x | (b << k);
         }
         Y32[i] = x;
@@ -419,6 +442,11 @@ void unpack_ui16matrix(uint16** X16, int src_height, int src_width, uint8** Y1)
 void unpack_ui32matrix(uint32** X32, int src_height, int src_width, uint8** Y1)
 // ----------------------------------------------------------------------------
 {
+  if (Y1 == NULL)
+    {
+        printf("Échec de l'allocation unpack function\n");
+        exit( EXIT_FAILURE);
+    }
     for(int i=0; i<src_height; i++) {
         unpack_ui32vector(X32[i], src_width, Y1[i]);
     }

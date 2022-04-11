@@ -285,18 +285,37 @@ uint32** ui32matrix(long nrl, long nrh, long ncl, long nch)
 /* --------------------------------------------------- */
 /* allocate an uint32 matrix with subscript range m[nrl..nrh][ncl..nch] */
 {
+  // long i, nrow=nrh-nrl+1,ncol=nch-ncl+1;
+  // uint32 **m;
+  //
+  // /* allocate pointers to rows */
+  // m=(uint32 **) malloc((size_t)((nrow+NR_END)*sizeof(uint32*)));
+  // if (!m) nrerror("allocation failure 1 in ui16matrix()");
+  // m += NR_END;
+  // m -= nrl;
+  //
+  // /* allocate rows and set pointers to them */
+  // m[nrl]=(uint32 *) malloc((size_t)((nrow*ncol+NR_END)*sizeof(uint32)));
+  // if (!m[nrl]) nrerror("allocation failure 2 in ui16matrix()");
+  // m[nrl] += NR_END;
+  // m[nrl] -= ncl;
+  //
+  // for(i=nrl+1;i<=nrh;i++) m[i]=m[i-1]+ncol;
+  //
+  // /* return pointer to array of pointers to rows */
+  // return m;
   long i, nrow=nrh-nrl+1,ncol=nch-ncl+1;
   uint32 **m;
 
   /* allocate pointers to rows */
   m=(uint32 **) malloc((size_t)((nrow+NR_END)*sizeof(uint32*)));
-  if (!m) nrerror("allocation failure 1 in ui16matrix()");
+  if (!m) nrerror("allocation failure 1 in uint32matrix()");
   m += NR_END;
   m -= nrl;
 
   /* allocate rows and set pointers to them */
   m[nrl]=(uint32 *) malloc((size_t)((nrow*ncol+NR_END)*sizeof(uint32)));
-  if (!m[nrl]) nrerror("allocation failure 2 in ui16matrix()");
+  if (!m[nrl]) nrerror("allocation failure 2 in uint32matrix()");
   m[nrl] += NR_END;
   m[nrl] -= ncl;
 
