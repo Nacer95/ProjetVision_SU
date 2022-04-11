@@ -349,8 +349,8 @@ void test_morpho_SWP_ouverture_routine(int h, int w0){
   //appel des fonctions ========================================== ==========================================
   //pack_ui8matrix(X, h, w1_8, Y8_rotation);
   ouverture3_ui8matrix_basic(X, 0, h-1, 0, w0-1, T_basic,  Y_basic);
-  ouverture3_ui8matrix_SWP_basic(X, h, w1_8, 0, h-1, 0, w8-1, Y8_rotation_unpack_erosion, Y8_rotation_unpack_ouverture);
-  // ouverture3_ui8matrix_pipeline_SWP_rotation(X, h, w1_8, 0, h-1, 0, w8-1, T8_rotation, Y8_rotation, Y8_rotation_unpack_erosion, Y8_rotation_unpack_ouverture);
+  // ouverture3_ui8matrix_SWP_basic(X, h, w1_8, 0, h-1, 0, w8-1, Y8_rotation_unpack_erosion, Y8_rotation_unpack_ouverture);
+  ouverture3_ui8matrix_pipeline_SWP_rotation(X, h, w1_8, 0, h-1, 0, w8-1, T8_rotation, Y8_rotation, Y8_rotation_unpack_erosion, Y8_rotation_unpack_ouverture);
 
   // min3_ui8matrix_swp_rotation (X, h, w1_8, -1, h, -1, w8,  T8_rotation,   Y8_rotation_unpack_erosion);
   // max3_ui8matrix_swp_rotation (Y8_rotation_unpack_erosion, h, w1_8, 0, h-1, 0, w8-1,  Y8_rotation,   Y8_rotation_unpack_ouverture);
@@ -422,8 +422,8 @@ void test_morpho_SWP_min(void){
 }
 
 void test_morpho_SWP_ouverture(void){
-  int h0 = 1000;
-  int w0 = 1000;
+  int h0 = 10;
+  int w0 = 6;
 
   int dh = 4;
   int dw = 3;

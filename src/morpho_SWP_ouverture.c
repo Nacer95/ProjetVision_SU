@@ -76,15 +76,16 @@ void ouverture3_ui8matrix_pipeline_SWP_rotation(uint8 **X, int h, int w, int i0,
   uint8 **X8           = ui8matrix (0-1*r, h-1+1*r, 0-1*r,  w8-1+1*r);
   pack_ui8matrix(X, h, w, X8);
 
-  line_min3_ui8matrix_swp_rotation(X8, i0, j0, j1, T8);
-  line_min3_ui8matrix_swp_rotation(X8, i0, j0, j1, T8);
+  line_min3_ui8matrix_swp_rotation(X8, i0, j0, j1, T8_rotation);
+  line_min3_ui8matrix_swp_rotation(X8, i0, j0, j1, T8_rotation);
 
   for (int i=i0; i<=i1; i++){
-    line_min3_ui8matrix_swp_rotation(X8, i+1, j0, j1,  T8);
-    line_max3_ui8matrix_swp_rotation(T8, i,   j0, j1,  Y8);
+    line_min3_ui8matrix_swp_rotation(X8, i+1, j0, j1,  T8_rotation);
+    line_max3_ui8matrix_swp_rotation(T8_rotation, i,   j0, j1,  Y8_rotation);
   }
   //unpack
-  unpack_ui8matrix (Y8 , h, w8, Y);
+  unpack_ui8matrix (T8_rotation , h, w8, Z);
+  unpack_ui8matrix (Y8_rotation , h, w8, Y);
 
 
 
