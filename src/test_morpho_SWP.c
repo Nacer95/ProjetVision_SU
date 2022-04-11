@@ -276,8 +276,8 @@ void test_morpho_SWP_ouverture_routine(int h, int w0){
   uint8 **X;
   uint8 **X8, **X1;
   uint8 **Y_basic, **T_basic, **T8_rotation;
-  uint8 **Y8_rotation, **Y8_rotation_unpack, **Y16_rotation_unpack, **Y32_rotation_unpack;
-  uint8 **Y8_rotation_unpack_erosion;
+  uint8 **Y8_rotation, **Y16_rotation_unpack, **Y32_rotation_unpack;
+  uint8 **Y8_rotation_unpack_erosion, **Y8_rotation_unpack_ouverture ;
 
   uint16 **Y16_rotation, **T16_rotation;
   uint32 **Y32_rotation, **T32_rotation;
@@ -301,22 +301,20 @@ void test_morpho_SWP_ouverture_routine(int h, int w0){
   X8     = ui8matrix(0-2*r, h-1+2*r, 0-1*r, w1_8-1+1*r);//taille matrice compacté
 
 
-  // Y8 1r-border compact
-  // T_basic                            = ui8matrix (0-2*r, h-1+2*r, 0-1*r,  w8-1+1*r);
+  // T 1r-border compact
+  T_basic                            = ui8matrix (0-2*r, h-1+2*r, 0-1*r,  w1_8-1+1*r);
   T8_rotation                        = ui8matrix (0-2*r, h-1+2*r, 0-1*r,  w8-1+1*r);
   T16_rotation                       = ui16matrix(0-2*r, h-1+2*r, 0-1*r, w16-1+1*r);
   T32_rotation                       = ui32matrix(0-2*r, h-1+2*r, 0-1*r, w32-1+1*r);
 
-  // Y8 1r-border resultat compacté
+  // Y 1r-border resultat compacté erosion
   Y8_rotation                        = ui8matrix (0-2*r, h-1+2*r, 0-1*r,  w8-1+1*r);
   Y16_rotation                       = ui16matrix(0-2*r, h-1+2*r, 0-1*r, w16-1+1*r);
   Y32_rotation                       = ui32matrix(0-2*r, h-1+2*r, 0-1*r, w32-1+1*r);
 
-  // Y 0r-border resultat unpack
-  T_basic                            = ui8matrix (0-2*r, h-1+2*r, 0-1*r,  w1_8-1+1*r);
+  // Y 1r-border resultat unpack ouverture
   Y_basic                            = ui8matrix (0-2*r, h-1+2*r, 0-1*r,  w1_8-1+1*r);
-
-  Y8_rotation_unpack                 = ui8matrix (0-2*r, h-1+2*r, 0-1*r,  w1_8-1+1*r);
+  Y8_rotation_unpack_ouverture       = ui8matrix (0-2*r, h-1+2*r, 0-1*r,  w1_8-1+1*r);
   Y8_rotation_unpack_erosion         = ui8matrix (0-2*r, h-1+2*r, 0-1*r,  w1_8-1+1*r);
 
   Y16_rotation_unpack                = ui8matrix (0-2*r, h-1+2*r, 0-1*r,  w1_8-1+1*r);
@@ -336,7 +334,7 @@ void test_morpho_SWP_ouverture_routine(int h, int w0){
   zero_ui32matrix(Y32_rotation,   0-2*r, h-1+2*r, 0-1*r, w32-1+1*r);
 
   //PUTS("zero Y");
-  zero_ui8matrix( Y8_rotation_unpack,              0-0*r, h-1+0*r, 0-0*r, w1_8-1+0*r );
+  zero_ui8matrix( Y8_rotation_unpack_ouverture,    0-0*r, h-1+0*r, 0-0*r, w1_8-1+0*r );
   zero_ui8matrix( Y8_rotation_unpack_erosion,      0-0*r, h-1+0*r, 0-0*r, w1_8-1+0*r );
   zero_ui8matrix( Y16_rotation_unpack,             0-0*r, h-1+0*r, 0-0*r, w1_16-1+0*r);
   zero_ui8matrix( Y32_rotation_unpack,             0-0*r, h-1+0*r, 0-0*r, w1_32-1+0*r);
@@ -344,20 +342,21 @@ void test_morpho_SWP_ouverture_routine(int h, int w0){
 
 
   //faire un random pour la matrice X ==========================================
-  rand1_ui8matrix(X, 0, h-1, 0, w0-1, 80);
-  // rand1_ui8matrix(X, 0, h-1, 0, w0-1, 20); // binaire [0,1] (afin d'avoir des '1' apres traitement et pas que des '0');
+  rand1_ui8matrix(X, 0, h-1, 0, w0-1, 50);
+  //rand1_ui8matrix(X, 0, h-1, 0, w0-1, 20); // binaire [0,1] (afin d'avoir des '1' apres traitement et pas que des '0');
   //display_ui8matrix (X,  0-2*r, h-1+2*r, 0-2*r, w1-1+2*r, format1, "X0");
 
   //appel des fonctions ========================================== ==========================================
   //pack_ui8matrix(X, h, w1_8, Y8_rotation);
-  // min3_ui8matrix_basic(X, -1, h, -1, w0, T_basic);
-  // max3_ui8matrix_basic(X, 0, h-1, 0, w0-1, Y_basic);
   ouverture3_ui8matrix_basic(X, 0, h-1, 0, w0-1, T_basic,  Y_basic);
+  ouverture3_ui8matrix_SWP_basic(X, h, w1_8, 0, h-1, 0, w8-1, T8_rotation, Y8_rotation, Y8_rotation_unpack_erosion, Y8_rotation_unpack_ouverture);
+  // ouverture3_ui8matrix_pipeline_SWP_rotation(X, h, w1_8, 0, h-1, 0, w8-1, T8_rotation, Y8_rotation, Y8_rotation_unpack_erosion, Y8_rotation_unpack_ouverture);
 
-
-
-  min3_ui8matrix_swp_rotation (X, h, w1_8, -1, h, -1, w8,  Y8_rotation,   Y8_rotation_unpack_erosion);
-  max3_ui8matrix_swp_rotation (Y8_rotation_unpack_erosion, h, w1_8, 0, h-1, 0, w8-1,  T8_rotation,   Y8_rotation_unpack);
+  // min3_ui8matrix_swp_rotation (X, h, w1_8, -1, h, -1, w8,  T8_rotation,   Y8_rotation_unpack_erosion);
+  // max3_ui8matrix_swp_rotation (Y8_rotation_unpack_erosion, h, w1_8, 0, h-1, 0, w8-1,  Y8_rotation,   Y8_rotation_unpack_ouverture);
+  // max3_ui8matrix_basic(X, 0, h-1, 0, w0-1, Y_basic);
+  // min3_ui8matrix_basic(X, -1, h, -1, w0, T_basic);
+  // ouverture3_ui8matrix_SWP_basic(X, h, w1_8, 0, h-1, 0, w8-1, T8_rotation, Y8_rotation, Y8_rotation_unpack_erosion, Y8_rotation_unpack_ouverture);
 
 
 
@@ -374,7 +373,7 @@ void test_morpho_SWP_ouverture_routine(int h, int w0){
 
 
   //compare Y
-  c = compare_ui8matrix(Y_basic, 0, h-1, 0, w0-1, Y8_rotation_unpack                        , "Y8_rotation_unpack                       ");
+  c = compare_ui8matrix(Y_basic, 0, h-1, 0, w0-1, Y8_rotation_unpack_ouverture                     , "Y8_rotation_unpack_ouverture             ");
 
 
 
@@ -423,8 +422,8 @@ void test_morpho_SWP_min(void){
 }
 
 void test_morpho_SWP_ouverture(void){
-  int h0 = 500;
-  int w0 = 100;
+  int h0 = 1000;
+  int w0 = 500;
 
   int dh = 4;
   int dw = 3;

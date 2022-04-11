@@ -23,7 +23,9 @@ extern "C" {
 // ========================
 
 // pipeline d'operateurs
-void ouverture3_ui8matrix_pipeline_SWP_rotation(uint8 **X, int h, int w, int i0, int i1, int j0, int j1, uint8 **T8, uint8 **Y8, uint8 **Y); 
+void ouverture3_ui8matrix_SWP_basic(uint8 **X, int h, int w, int i0, int i1, int j0, int j1, uint8 **T8, uint8 **Y8, uint8 **Z, uint8 **Y);
+void ouverture3_ui8matrix_pipeline_SWP_rotation(uint8 **X, int h, int w, int i0, int i1, int j0, int j1, uint8 **T8, uint8 **Y8, uint8 **Z, uint8 **Y);
+
 
 #ifdef __cplusplus
 }
