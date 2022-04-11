@@ -18,23 +18,40 @@ extern "C" {
 // mettre les macro left/right ici
 //mettre le plus grand element de a à droite de b
 //decaler b de 1 vers la gauche
-#define macro_ui32left1(a,b) (a >> (32-1)) | (b << 1)
-#define macro_ui16left1(a,b) (a >> (16-1)) | (b << 1)
-#define macro_ui8left1(a,b)  (a >> (8-1))  | (b << 1)
+// #define macro_ui32left1(a,b) (a >> (32-1)) | (b << 1)
+// #define macro_ui16left1(a,b) (a >> (16-1)) | (b << 1)
+// #define macro_ui8left1(a,b)  (a >> (8-1))  | (b << 1)
+//
+// //decaler b de 1 vers la droite
+// //mettre le plus petit element de a à gauche de b
+// #define macro_ui32right1(a,b) (b >> 1) | (a << (32-1))
+// #define macro_ui16right1(a,b) (b >> 1) | (a << (16-1))
+// #define macro_ui8right1(a,b)  (b >> 1) | (a << (8-1))
+//
+//
+// #define mot_min3(x, y, z) (x&y&z)
+// #define mot_min2(x, y) (x&y)
+//
+// #define mot_max3(x, y, z) (x|y|z)
+// #define mot_max2(x, y) (x|y)
 
-//decaler b de 1 vers la droite
-//mettre le plus petit element de a à gauche de b
-#define macro_ui32right1(a,b) (b >> 1) | (a << (32-1))
-#define macro_ui16right1(a,b) (b >> 1) | (a << (16-1))
-#define macro_ui8right1(a,b)  (b >> 1) | (a << (8-1))
 
+// mettre les macro left/right ici
+// -----------------------------------
+#define macro_ui8left1(a, b) (a >> (8-1)) | (b << 1);
+#define macro_ui16left1(a, b) (a >> (16-1)) | (b << 1);
 
-#define mot_min3(x, y, z) (x&y&z)
-#define mot_min2(x, y) (x&y)
+// ---------------------------------------
+#define ui32left_macro(a, b) (a >> (32-1)) | (b << 1);
 
-#define mot_max3(x, y, z) (x|y|z)
-#define mot_max2(x, y) (x|y)
+// ------------------------------------
+#define macro_ui8right1(b, c) (b >> 1) | (c << (8-1));
+#define macro_ui16right1(b, c) (b >> 1) | (c << (16-1));
 
+// ----------------------------------------
+#define ui32right_macro(b, c) (b >> 1) | (c << (32-1));
+
+#define mot_max3(a, b, c) (a | b | c) //OR bit a bit
 
 
 uint8   ui8left( uint8 a,  uint8 b, int k);

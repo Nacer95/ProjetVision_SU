@@ -631,9 +631,9 @@ void line_ouverture3_ui8matrix_fusion_ilu5_elu2_red(uint8 **X, int i, int j0, in
 
 
     // Calcule des mins de la bordure gauche
-    min_bordure_gauche_haut   = min3(b1, b6,  b8);
-    min_bordure_gauche_milieu = min3(b6, b8,  b10);
-    min_bordure_gauche_bas    = min3(b8, b10, b12);
+    min_bordure_gauche_haut   = min3(b1,  b6,  b8);
+    min_bordure_gauche_milieu = min3(b6,  b8,  b10);
+    min_bordure_gauche_bas    = min3(b8,  b10, b12);
     min_bordure_gauche_bas2   = min3(b10, b12, b17);
 
 

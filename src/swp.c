@@ -262,7 +262,7 @@ void unpack_ui16vector(uint16* X16, int src_width, uint8* Y1)
 {
     for(int i=0; i<src_width; i++) {
 
-        uint8 x = X16[i];
+        uint16 x = X16[i];
 
         for(int k=0; k<16; k++) {
             Y1[16*i + k] = x & 1;
@@ -325,17 +325,20 @@ void pack_ui16vector(uint8* X1, int src_width, uint16* Y16)
 // --------------------------------------------------------
 {
     int dst_width = src_width/16;
+    printf("dst_width = %d\n",dst_width );
 
     for(int i=0; i<dst_width; i++) {
 
-        uint8 x = 0;
+
+        uint16 x = 0;
 
         for(int k=0; k<16; k++) {
 
-            uint8 b = X1[16*i + k];
+            uint16 b = X1[16*i + k];
             x = x | (b << k);
         }
         Y16[i] = x;
+        if (i == 1){ printf(" 2 %d\n",x );}
     }
 }
 // --------------------------------------------------------

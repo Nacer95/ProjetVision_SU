@@ -988,3 +988,381 @@ void line_ouverture3_ui8matrix_fusion_red(uint8 **X, int i, int j0, int j1, uint
     }
 
   }
+
+
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  //======================  //======================  //======================  //======================  //======================  //======================  //======================  //======================
+  #include <stdio.h>
+  #include <stdlib.h>
+  #include <stddef.h>
+  #include <string.h>
+  #include <math.h>
+
+  #include "nrtype.h"
+  #include "nrdef.h"
+  #include "nrutil.h"
+
+  #include "macro_bench.h"
+  #include "x86intrin.h" // _rdtsc()
+
+  #include "swp.h"
+  #include "morpho_max.h"
+  #include "morpho_min.h"
+  #include "morpho_ouverture.h"
+
+  #include "morpho_test.h"
+  #include "morpho_SWP.h"
+
+
+
+  void testing(){
+   printf("réussit\n");
+  }
+
+  // ------------------------------------------------------------------------
+  void line_swp8_ui8matrix_basic(uint8 **T, int i, int j0, int j1, uint8 **Z)
+  // ------------------------------------------------------------------------
+  {
+   printf("moi\n");
+   // pas d'epilogue car utilisation du padding
+   for (int j = j0; j<= j1; j++){
+     //charger la bordure de gauche
+     uint8 haut_gauche   = load2(T, i-1 , j-1 );
+     uint8 milieu_gauche = load2(T, i   , j-1 );
+     uint8 bas_gauche    = load2(T, i-1 , j-1 );
+
+     uint8 haut_milieu   = load2(T, i-1 , j );
+     uint8 milieu_milieu = load2(T, i   , j );
+     uint8 bas_milieu    = load2(T, i+1 , j );
+
+     uint8 haut_droit    = load2(T, i-1,   j+1);
+     uint8 milieu_droit  = load2(T, i  ,   j+1);
+     uint8 bas_droit     = load2(T, i+1,   j+1);
+
+
+     uint8 min3_gauche  = mot_min3(haut_gauche, milieu_gauche, bas_gauche);
+     uint8 min3_milieu  = mot_min3(haut_milieu, milieu_milieu, bas_milieu);
+     uint8 min3_droite  = mot_min3(haut_droit,  milieu_droit,  bas_droit);
+
+     //permutation
+     //Le Dernier de droite et les dernier de b
+     uint8 mot_pemutation_gauche = macro_ui8left1(min3_gauche,  min3_milieu);
+     uint8 mot_permutation_droit = macro_ui8right1(min3_milieu, min3_droite);
+
+     //min
+     uint8 min3_res = mot_min3(mot_pemutation_gauche, min3_milieu, mot_permutation_droit);
+
+     //store
+     store2(Z, i, j, min3_res);
+
+     //permutation colonne gauche
+     // haut_gauche   = haut_milieu;
+     // milieu_gauche = milieu_milieu;
+     // bas_gauche    = bas_milieu;
+     //
+     // haut_milieu   = haut_droit;
+     // milieu_milieu = milieu_droit;
+     // bas_milieu    = bas_droit;
+
+   }
+  }
+
+  //   //charger la bordure de gauche
+  // uint8 haut_gauche = 0;
+  // uint8 milieu_gauche = 0;
+  // uint8 bas_gauche = 0;
+  // uint8 haut_milieu   = load2(X8, i-1 , j0);
+  // uint8 milieu_milieu = load2(X8, i   , j0);
+  // uint8 bas_milieu    = load2(X8, i+1 , j0);
+  // uint8 min3_gauche  = mot_max3(haut_gauche, milieu_gauche, bas_gauche);
+  // uint8 min3_milieu  = mot_max3(haut_milieu, milieu_milieu, bas_milieu);
+  // uint8 haut_droit,  milieu_droit,  bas_droit, min3_droite;
+  // uint8 mot_pemutation_gauche , mot_permutation_droit;
+  // uint8 min3_res;
+  // // pas d'epilogue car utilisation du padding
+  // // printf("Ligne : %d\n", i);
+  // for (int j = j0; j<= j1; j++){
+  //     haut_droit    = load2(X8, i-1,   j+1);
+  //     milieu_droit  = load2(X8, i  ,   j+1);
+  //     bas_droit     = load2(X8, i+1,   j+1);
+  //     // printf("M1 : %d M2 : %d M3 : %d\n", haut_gauche, haut_milieu, haut_droit);
+  //     // printf("M4 : %d M5 : %d M6 : %d\n", milieu_gauche, milieu_milieu, milieu_droit);
+  //     // printf("M8 : %d M9 : %d M10 : %d\n", bas_gauche, bas_milieu, bas_droit);
+  //     min3_gauche  = mot_max3(haut_gauche, milieu_gauche, bas_gauche);
+  //     min3_milieu  = mot_max3(haut_milieu, milieu_milieu, bas_milieu);
+  //     min3_droite  = mot_max3(haut_droit,  milieu_droit,  bas_droit);
+  //     // printf("Min g : %d\n", min3_gauche);
+  //     // printf("Min m : %d\n", min3_milieu);
+  //     // printf("Min d : %d\n", min3_droite);
+  //     //permutation
+  //     mot_pemutation_gauche = macro_ui8left1(min3_gauche, min3_milieu);
+  //     mot_permutation_droit = macro_ui8right1(min3_milieu, min3_droite);
+  //     //min
+  //     min3_res = mot_max3(mot_pemutation_gauche, min3_milieu, mot_permutation_droit);
+  //     // printf("j : %d, r : %d\n", j , min3_res);
+  //     //store
+  //     store2(Y8, i, j, min3_res);
+  //     //permutation colonne gauche
+  //     haut_gauche   = haut_milieu;
+  //     milieu_gauche = milieu_milieu;
+  //     bas_gauche    = bas_milieu;
+  //     haut_milieu   = haut_droit;
+  //     milieu_milieu = milieu_droit;
+  //     bas_milieu    = bas_droit;
+  //   }
+  // }
+  //
+  // void line_swp8_ui8matrix_basic_min(uint8 **X8, int i, int j0, int j1, uint8 **Y8)
+  // // ------------------------------------------------------------------------
+  // {
+  //
+  //   // // pas d'epilogue car utilisation du padding
+  //   // for (int j = j0; j<= j1; j++){
+  //   //   //charger la bordure de gauche
+  //   //   uint8 haut_gauche   = load2(T, i-1 , j-1 );
+  //   //   uint8 milieu_gauche = load2(T, i   , j-1 );
+  //   //   uint8 bas_gauche    = load2(T, i-1 , j-1 );
+  //   //
+  //   //   uint8 haut_milieu   = load2(T, i-1 , j );
+  //   //   uint8 milieu_milieu = load2(T, i   , j );
+  //   //   uint8 bas_milieu    = load2(T, i+1 , j );
+  //   //
+  //   //   uint8 haut_droit    = load2(T, i-1,   j+1);
+  //   //   uint8 milieu_droit  = load2(T, i  ,   j+1);
+  //   //   uint8 bas_droit     = load2(T, i+1,   j+1);
+  //   //
+  //   //
+  //   //   uint8 min3_gauche  = mot_min3(haut_gauche, milieu_gauche, bas_gauche);
+  //   //   uint8 min3_milieu  = mot_min3(haut_milieu, milieu_milieu, bas_milieu);
+  //   //   uint8 min3_droite  = mot_min3(haut_droit,  milieu_droit,  bas_droit);
+  //   //
+  //   //   //permutation
+  //   //   //Le Dernier de droite et les dernier de b
+  //   //   uint8 mot_pemutation_gauche = macro_ui8left1(min3_gauche,  min3_milieu);
+  //   //   uint8 mot_permutation_droit = macro_ui8right1(min3_milieu, min3_droite);
+  //   //
+  //   //   //min
+  //   //   uint8 min3_res = mot_min3(mot_pemutation_gauche, min3_milieu, mot_permutation_droit);
+  //   //
+  //   //   //store
+  //   //   store2(Z, i, j, min3_res);
+  //   //
+  //   //   //permutation colonne gauche
+  //   //   // haut_gauche   = haut_milieu;
+  //   //   // milieu_gauche = milieu_milieu;
+  //   //   // bas_gauche    = bas_milieu;
+  //   //   //
+  //   //   // haut_milieu   = haut_droit;
+  //   //   // milieu_milieu = milieu_droit;
+  //   //   // bas_milieu    = bas_droit;
+  //   //
+  //   // }
+  //
+  //   //charger la bordure de gauche
+  // uint8 haut_gauche = 0;
+  // uint8 milieu_gauche = 0;
+  // uint8 bas_gauche = 0;
+  // uint8 haut_milieu   = load2(X8, i-1 , j0);
+  // uint8 milieu_milieu = load2(X8, i   , j0);
+  // uint8 bas_milieu    = load2(X8, i+1 , j0);
+  // uint8 min3_gauche  = mot_min3(haut_gauche, milieu_gauche, bas_gauche);
+  // uint8 min3_milieu  = mot_min3(haut_milieu, milieu_milieu, bas_milieu);
+  // uint8 haut_droit,  milieu_droit,  bas_droit, min3_droite;
+  // uint8 mot_pemutation_gauche , mot_permutation_droit;
+  // uint8 min3_res;
+  // // pas d'epilogue car utilisation du padding
+  // // printf("Ligne : %d\n", i);
+  // for (int j = j0; j<= j1; j++){
+  //     haut_droit    = load2(X8, i-1,   j+1);
+  //     milieu_droit  = load2(X8, i  ,   j+1);
+  //     bas_droit     = load2(X8, i+1,   j+1);
+  //     // printf("M1 : %d M2 : %d M3 : %d\n", haut_gauche, haut_milieu, haut_droit);
+  //     // printf("M4 : %d M5 : %d M6 : %d\n", milieu_gauche, milieu_milieu, milieu_droit);
+  //     // printf("M8 : %d M9 : %d M10 : %d\n", bas_gauche, bas_milieu, bas_droit);
+  //     min3_gauche  = mot_min3(haut_gauche, milieu_gauche, bas_gauche);
+  //     min3_milieu  = mot_min3(haut_milieu, milieu_milieu, bas_milieu);
+  //     min3_droite  = mot_min3(haut_droit,  milieu_droit,  bas_droit);
+  //     // printf("Min g : %d\n", min3_gauche);
+  //     // printf("Min m : %d\n", min3_milieu);
+  //     // printf("Min d : %d\n", min3_droite);
+  //     //permutation
+  //     mot_pemutation_gauche = macro_ui8left1(min3_gauche, min3_milieu);
+  //     mot_permutation_droit = macro_ui8right1(min3_milieu, min3_droite);
+  //     //min
+  //     min3_res = mot_min3(mot_pemutation_gauche, min3_milieu, mot_permutation_droit);
+  //     // printf("j : %d, r : %d\n", j , min3_res);
+  //     //store
+  //     store2(Y8, i, j, min3_res);
+  //     //permutation colonne gauche
+  //     haut_gauche   = haut_milieu;
+  //     milieu_gauche = milieu_milieu;
+  //     bas_gauche    = bas_milieu;
+  //     haut_milieu   = haut_droit;
+  //     milieu_milieu = milieu_droit;
+  //     bas_milieu    = bas_droit;
+  //   }
+  // }
+  // ------------------------------------------------------------------------
+  // void line_swp16_ui8matrix_basic(uint8 *X, int i, int j0, int j1, uint16 *T, uint8 *Y)
+  // // ------------------------------------------------------------------------
+  // {
+  // }
+  // // ------------------------------------------------------------------------
+  // void line_swp32_ui8matrix_basic(uint8 *X, int i, int j0, int j1, uint32 *T, uint8 *Y)
+  // // ------------------------------------------------------------------------
+  // {
+  // }
+  // void line_swp64_ui8matrix_basic(uint8 *X, int i, int j0, int j1, uint64 *T, uint8 *Y)
+  // // ------------------------------------------------------------------------
+  // {
+  // }
+  // ----------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------
+
+
+  // void swp8_ui8matrix_basic(uint8 **X, int wX, int hX,  int i0, int i1, int j0, int j1,int w8, uint8 **T8, uint8 **Z8, uint8 **Y)
+  // // ----------------------------------------------------------------------------
+  // {
+  //   // faire le pack de X dans T
+  //   pack_ui8matrix(X, hX, wX, T8);
+  //   // display_ui8matrix()
+  //   // calcule de chaque ligne
+  //   for(int i = i0; i<=i1; i++){
+  //     line_swp8_ui8matrix_basic(T8, i, j0, j1, Z8);
+  //   }
+  //   // unpack z dans Y
+  //   unpack_ui8matrix (Z8 , hX, w8, Y);
+  // }
+
+  // ------------------------------------------------------------------------
+  void line_max3_ui8matrix_swp_basic(uint8 **X8, int i, int j0, int j1, uint8 **Y8)
+  // ------------------------------------------------------------------------
+  {
+     //charger la bordure de gauche
+     uint8 haut_gauche = 0;
+     uint8 milieu_gauche = 0;
+     uint8 bas_gauche = 0;
+
+     uint8 haut_milieu   = load2(X8, i-1 , j0);
+     uint8 milieu_milieu = load2(X8, i   , j0);
+     uint8 bas_milieu    = load2(X8, i+1 , j0);
+
+     uint8 min3_gauche  = mot_max3(haut_gauche, milieu_gauche, bas_gauche);
+     uint8 min3_milieu  = mot_max3(haut_milieu, milieu_milieu, bas_milieu);
+
+     uint8 haut_droit,  milieu_droit,  bas_droit, min3_droite;
+     uint8 mot_pemutation_gauche , mot_permutation_droit;
+     uint8 min3_res;
+     // pas d'epilogue car utilisation du padding
+     // printf("Ligne : %d\n", i);
+     for (int j = j0; j<= j1; j++){
+         haut_droit    = load2(X8, i-1,   j+1);
+         milieu_droit  = load2(X8, i  ,   j+1);
+         bas_droit     = load2(X8, i+1,   j+1);
+         // printf("M1 : %d M2 : %d M3 : %d\n", haut_gauche, haut_milieu, haut_droit);
+         // printf("M4 : %d M5 : %d M6 : %d\n", milieu_gauche, milieu_milieu, milieu_droit);
+         // printf("M8 : %d M9 : %d M10 : %d\n", bas_gauche, bas_milieu, bas_droit);
+         min3_gauche  = mot_max3(haut_gauche, milieu_gauche, bas_gauche);
+         min3_milieu  = mot_max3(haut_milieu, milieu_milieu, bas_milieu);
+         min3_droite  = mot_max3(haut_droit,  milieu_droit,  bas_droit);
+         // printf("Min g : %d\n", min3_gauche);
+         // printf("Min m : %d\n", min3_milieu);
+         // printf("Min d : %d\n", min3_droite);
+         //permutation
+         mot_pemutation_gauche = macro_ui8left1(min3_milieu, min3_gauche);
+         mot_permutation_droit = macro_ui8right1(min3_milieu, min3_droite);
+         //min
+         min3_res = mot_max3(mot_pemutation_gauche, min3_milieu, mot_permutation_droit);
+         // printf("j : %d, r : %d\n", j , min3_res);
+         //store
+         store2(Y8, i, j, min3_res);
+         //permutation colonne gauche
+         haut_gauche   = haut_milieu;
+         milieu_gauche = milieu_milieu;
+         bas_gauche    = bas_milieu;
+
+         haut_milieu   = haut_droit;
+         milieu_milieu = milieu_droit;
+         bas_milieu    = bas_droit;
+     }
+  }
+  // -------------------------------------------------------------------------------
+  void max3_ui8matrix_swp_basic(uint8 **X8, int h, int w, int i0, int i1, int j0, int j1, uint8 **Y)
+  // -------------------------------------------------------------------------------
+  {
+     uint8 **Y8 =  ui8matrix(0, h, 0, j1+1);
+     zero_ui8matrix(Y8,      0, h, 0, j1+1);
+     displayR_ui8matrix (X8, i0, i1, j0, j1, "X8_mat");
+     for(int i = i0; i<=i1; i++){
+       line_max3_ui8matrix_swp_basic(X8, i, j0, j1, Y8);
+     }
+     // unpack z dans Y
+     displayR_ui8matrix (Y8, i0, i1, j0, j1, "Y8_mat");
+     display_ui8matrix (Y8,  0, h-1, 0, j1, "%5d", "Y8");
+     unpack_ui8matrix (Y8 , h, j1+1, Y);
+  }
+
+  // // -------------------------------------------------------------------------------
+  // void min3_ui8matrix_swp_basic(uint8 **X8, int h, int w, int i0, int i1, int j0, int j1, uint8 **Y)
+  // // -------------------------------------------------------------------------------
+  // {
+  //     uint8 **Y8 =  ui8matrix(0, h, 0, j1+1);
+  //     zero_ui8matrix(Y8,      0, h, 0, j1+1);
+  //     // displayR_ui8matrix (X8, i0, i1, j0, j1, "X8_mat");
+  //     for(int i = i0; i<=i1; i++){
+  //       line_swp8_ui8matrix_basic_min(X8, i, j0, j1, Y8);
+  //     }
+  //     // unpack z dans Y
+  //     displayR_ui8matrix (Y8, i0, i1, j0, j1, "Y8_mat");
+  //     // display_ui8matrix (Y8,  0, h-1, 0, j1, "%5d", "Y8");
+  //     unpack_ui8matrix (Y8 , h, j1+1, Y);
+  // }
+
+  // void swp16_ui8matrix_basic(uint8 **X, int i0, int i1, int j0, int j1, uint16 **T, uint8 **Y)
+  // // ----------------------------------------------------------------------------
+  // {
+  // }
+  // void swp32_ui8matrix_basic(uint8 **X, int i0, int i1, int j0, int j1, uint32 **T, uint8 **Y)
+  // // ----------------------------------------------------------------------------
+  // {
+  // }
+  // void swp64_ui8matrix_basic(uint8 **X, int i0, int i1, int j0, int j1, uint64 **T, uint8 **Y)
+  // // ----------------------------------------------------------------------------
+  // {
+  // }

@@ -28,8 +28,10 @@
 #include "morpho_max.h"
 #include "morpho_min.h"
 #include "morpho_ouverture.h"
+#include "morpho_SWP.h"
 
 #include "morpho_test.h"
+
 
 // -------------------------------------------------------------------------------
 void rand_ui8matrix(uint8 **X, int i0, int i1, int j0, int j1, uint8 x0, uint8 x1)
@@ -100,12 +102,14 @@ void test_morpho_max_routine(int h, int w0)
     printf("test_morpho_max_routine h = %d w0 = %d w8 = %d, w1 = %d\n", h, w0, w8, w1);
     if(w1 > w0) puts("w1 > w0");
     uint8 **X;
+    uint8 **X8, **Y_swp_bas;
     uint8 **Y_bas, **Y_reg, **Y_rot, **Y_red, **Y_ilu3, **Y_ilu3r, **Y_elu2r, **Y_elu2rf, **Y_ilu3_elu2r, **Y_ilu3_elu2rf;
 
     int c; // error
 
     //puts("malloc");
     X  = ui8matrix(0-b, h-1+b, 0-b, w1-1+b);
+    X8 = ui8matrix(0-b, h-1+b, 0-b, w8-1+b);
 
     Y_bas         = ui8matrix(0, h-1, 0, w1-1);
     Y_reg         = ui8matrix(0, h-1, 0, w1-1);
@@ -117,9 +121,13 @@ void test_morpho_max_routine(int h, int w0)
     Y_elu2rf      = ui8matrix(0, h-1, 0, w1-1);
     Y_ilu3_elu2r  = ui8matrix(0, h-1, 0, w1-1);
     Y_ilu3_elu2rf = ui8matrix(0, h-1, 0, w1-1);/**/
+    Y_swp_bas     = ui8matrix(0, h-1, 0, w1-1);/**/
+
 
     //puts("zero");
     zero_ui8matrix(X,  0-b, h-1+b, 0-b, w1-1+b);
+    zero_ui8matrix(X8,  0-b, h-1+b, 0-b, w8    );
+
 
     zero_ui8matrix(Y_bas,         0, h-1, 0, w1-1);
     zero_ui8matrix(Y_reg,         0, h-1, 0, w1-1);
@@ -131,6 +139,7 @@ void test_morpho_max_routine(int h, int w0)
     zero_ui8matrix(Y_elu2rf,      0, h-1, 0, w1-1);
     zero_ui8matrix(Y_ilu3_elu2r , 0, h-1, 0, w1-1);
     zero_ui8matrix(Y_ilu3_elu2rf, 0, h-1, 0, w1-1);
+    zero_ui8matrix(Y_swp_bas    , 0, h-1, 0, w1-1);
 
     //puts("rand");
 
@@ -141,6 +150,9 @@ void test_morpho_max_routine(int h, int w0)
     //puts("display");
     //display_ui8matrix (X,  0, h-1, 0, w0-1, "%5d", "X0");
 
+    //SWP pack
+    pack_ui8matrix(X, h, w1, X8);
+
     //puts("\n-- max3 --");
     max3_ui8matrix_basic               (X, 0, h-1, 0, w0-1, Y_bas);         // puts("bas");
     max3_ui8matrix_reg                 (X, 0, h-1, 0, w0-1, Y_reg);         // puts("reg");
@@ -150,12 +162,15 @@ void test_morpho_max_routine(int h, int w0)
     max3_ui8matrix_ilu3_red            (X, 0, h-1, 0, w0-1, Y_ilu3r);       // puts("ilu3_red");
     max3_ui8matrix_elu2_red            (X, 0, h-1, 0, w0-1, Y_elu2r);       // puts("elu2_red");
     max3_ui8matrix_elu2_red_factor     (X, 0, h-1, 0, w0-1, Y_elu2rf);      // puts("elu2_red_factor");
-    max3_ui8matrix_ilu3_elu2_red       (X, 0, h-1, 0, w0-1, Y_ilu3_elu2r); // puts("ilu3_elu2_red");
+    max3_ui8matrix_ilu3_elu2_red       (X, 0, h-1, 0, w0-1, Y_ilu3_elu2r);  // puts("ilu3_elu2_red");
     max3_ui8matrix_ilu3_elu2_red_factor(X, 0, h-1, 0, w0-1, Y_ilu3_elu2rf); // puts("ilu3_elu2_red_factor");
+    max3_ui8matrix_swp_rotation        (X8, h, w1, 0, h-1, 0, w8-1, Y_swp_bas);
 
     //puts("done\n");
+    // display_ui8matrix (X,   0, h-1, 0, w0-1, "%5d", "X0");
+    // display_ui8matrix (X8,  0, h-1, 0, w8-1, "%5d", "X8");
 
-    //display_ui8matrix(Y_bas,         0, h-1, 0, w0-1, "%5d", "Y bas        ");
+    // display_ui8matrix(Y_bas,         0, h-1, 0, w0-1, "%2d", "Y bas        ");
     /*display_ui8matrix(Y_reg,         0, h-1, 0, w0-1, "%5d", "Y reg        ");
     display_ui8matrix(Y_reg,         0, h-1, 0, w0-1, "%5d", "Y reg        ");
     display_ui8matrix(Y_rot,         0, h-1, 0, w0-1, "%5d", "Y rot        ");
@@ -167,15 +182,17 @@ void test_morpho_max_routine(int h, int w0)
     display_ui8matrix(Y_ilu3_elu2rf, 0, h-1, 0, w0-1, "%5d", "Y ilu3 elu2rf");/**/
 
     puts("-- compare max --");
-    c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_reg        , "Y reg                       ");
-    c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_rot        , "Y rot                       ");
-    c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_red        , "Y red                       ");
-    c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_ilu3       , "Y ilu3                      ");
-    c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_ilu3r      , "Y ilu3 + red                ");
-    c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_elu2r      , "Y elu2 + red                ");
-    c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_elu2rf     , "Y elu2 + red + factor       ");
-    c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_ilu3_elu2r , "Y ilu3 + elu2 + red         ");
-    c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_ilu3_elu2rf, "Y ilu3 + elu2 + red + factor");
+    // c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_reg        , "Y reg                       ");
+    // c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_rot        , "Y rot                       ");
+    // c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_red        , "Y red                       ");
+    // c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_ilu3       , "Y ilu3                      ");
+    // c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_ilu3r      , "Y ilu3 + red                ");
+    // c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_elu2r      , "Y elu2 + red                ");
+    // c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_elu2rf     , "Y elu2 + red + factor       ");
+    // c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_ilu3_elu2r , "Y ilu3 + elu2 + red         ");
+    // c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_ilu3_elu2rf, "Y ilu3 + elu2 + red + factor");
+    c = compare_ui8matrix(Y_bas, 0, h-1, 0, w0-1, Y_swp_bas    , "Y swp bas                   ");
+
     putchar('\n');
     //puts("done\n");
 
@@ -442,9 +459,9 @@ void test_morpho_ouverture_routine(int h, int w0)
     // T: full-matrix
     // ouverture3_ui8matrix_pipeline_basic               (X, 0, h-1, 0, w0-1, T_pipeline                     , Y_pipeline                     );
     // ouverture3_ui8matrix_pipeline_red                 (X, 0, h-1, 0, w0-1, T_pipeline_red                 , Y_pipeline_red                 );
-    // // ouverture3_ui8matrix_pipeline_ilu3_red            (X, 0, h-1, 0, w0-1, T_pipeline_ilu3_red            , Y_pipeline_ilu3_red            );///P
+    // ouverture3_ui8matrix_pipeline_ilu3_red            (X, 0, h-1, 0, w0-1, T_pipeline_ilu3_red            , Y_pipeline_ilu3_red            );///P
     // ouverture3_ui8matrix_pipeline_elu2_red            (X, 0, h-1, 0, w0-1, T_pipeline_elu2_red            , Y_pipeline_elu2_red            );
-    // // ouverture3_ui8matrix_pipeline_elu2_red_factor     (X, 0, h-1, 0, w0-1, T_pipeline_elu2_red_factor     , Y_pipeline_elu2_red_factor     );//PPPP
+    // ouverture3_ui8matrix_pipeline_elu2_red_factor     (X, 0, h-1, 0, w0-1, T_pipeline_elu2_red_factor     , Y_pipeline_elu2_red_factor     );//PPPP
     // ouverture3_ui8matrix_pipeline_ilu3_elu2_red       (X, 0, h-1, 0, w0-1, T_pipeline_ilu3_elu2_red       , Y_pipeline_ilu3_elu2_red       );
     // ouverture3_ui8matrix_pipeline_ilu3_elu2_red_factor(X, 0, h-1, 0, w0-1, T_pipeline_ilu3_elu2_red_factor, Y_pipeline_ilu3_elu2_red_factor);
 
@@ -880,10 +897,10 @@ int test_morpho(int argc, char* argv[])
 {
     // puts("=== test_morpho ===");
     // puts("=== test_morpho max ===");
-    //test_morpho_max();
+    test_morpho_max();
     // puts("=== test_morpho min ===");
     //test_morpho_min(); //validés
-    test_morpho_ouverture();
+    //test_morpho_ouverture();
 
     //bench_morpho_ouverture(128, 512, 8);
     //bench_morpho_ouverture(128, 1024, 8);

@@ -4,7 +4,7 @@
 
 /*
  * Copyright (c) 2004 - 2013, Lionel Lacassagne, All rights reserved
- * University of Paris Sud, Laboratoire de Recherche en Informatique 
+ * University of Paris Sud, Laboratoire de Recherche en Informatique
  */
 
 #ifndef __MORPHO_OUVERTURE_H__
