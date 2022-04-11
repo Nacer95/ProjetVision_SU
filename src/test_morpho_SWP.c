@@ -445,8 +445,8 @@ void test_morpho_SWP_ouverture(void){
 int test_swp(int argc, char* argv[]){
   // test_morpho_SWP_max();
   // test_morpho_SWP_min();
-
-  test_morpho_SWP_ouverture();
+  //
+  // test_morpho_SWP_ouverture();
 
   return 0;
 }
