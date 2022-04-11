@@ -434,7 +434,7 @@ void test_morpho_ouverture_routine(int h, int w0)
 
     ouverture3_ui8matrix_fusion                     (X, 0, h-1, 0, w0-1,          Y_fusion                     );
     ouverture3_ui8matrix_fusion_ilu5_red            (X, 0, h-1, 0, w0-1,          Y_fusion_ilu5_red            );
-    ouverture3_ui8matrix_fusion_ilu5_elu2_red         (X, 0, h-1, 0, w0-1,           Y_fusion_ilu5_elu2_red       );
+    ouverture3_ui8matrix_fusion_ilu5_elu2_red       (X, 0, h-1, 0, w0-1,           Y_fusion_ilu5_elu2_red       );
     ouverture3_ui8matrix_fusion_ilu5_elu2_red_factor(X, 0, h-1, 0, w0-1,          Y_fusion_ilu5_elu2_red_factor);
     ouverture3_ui8matrix_fusion_ilu15_red           (X, 0, h-1, 0, w0-1,          Y_fusion_ilu15_red           );
 

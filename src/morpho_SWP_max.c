@@ -181,6 +181,16 @@
      }
      unpack_ui8matrix (Z8 , h, w8, Y);
  }
+ void max3_ui8matrix_swp_rotation_trivial(uint8 **X8, int h, int w, int i0, int i1, int j0, int j1, uint8 **Z8, uint8 **Y)
+ // -------------------------------------------------------------------------------
+ {
+     int w8      = j1+1;
+     // displayR_ui8matrix (X8, i0, i1, j0, j1, "X8_mat");
+     for(int i = i0; i<=i1; i++){
+       line_max3_ui8matrix_swp_rotation(X8, i, j0, j1, Z8);
+     }
+     unpack_ui8matrix (Z8 , h, w8, Y);
+ }
  // -------------------------------------------------------------------------------
  void max3_ui16matrix_swp_rotation(uint8 **X, int h, int w, int i0, int i1, int j0, int j1, uint16 **Z16, uint8 **Y)
  // -------------------------------------------------------------------------------
