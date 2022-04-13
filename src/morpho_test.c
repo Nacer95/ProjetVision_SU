@@ -737,52 +737,61 @@ void bench_morpho_ouverture(int n0, int n1, int nstep)
     uint8 **X;
     uint8 **X8, **X1;
 
-    uint8 **T_basic;
+    puts("========================================");
+    puts("==       Ouverture du fichier        ===");
+    puts("========================================");
+    char * bench_max      = "bench_resultats/bench_max_tableau.txt";
+    char * bench_fusion   = "bench_resultats/bench_fusion_tableau.txt";
+    char * bench_pipeline = "bench_resultats/bench_pipeline_tableau.txt";
 
-    uint8 **Y_basic;
-    uint8 **Y_fusion;
-    uint8 **Y_fusion_ilu5_red;
-    uint8 **Y_fusion_ilu5_elu2_red;
-    uint8 **Y_fusion_ilu5_elu2_red_factor;
-    uint8 **Y_fusion_ilu15_red;
+    FILE * inputFile_max;
+    FILE * inputFile_fusion;
+    FILE * inputFile_pipeline;
 
-    uint8 **T_pipeline                     , **Y_pipeline;
-    uint8 **T_pipeline_red                 , **Y_pipeline_red;
-    uint8 **T_pipeline_ilu3_red            , **Y_pipeline_ilu3_red;
-    uint8 **T_pipeline_elu2_red            , **Y_pipeline_elu2_red;
-    uint8 **T_pipeline_elu2_red_factor     , **Y_pipeline_elu2_red_factor;
-    uint8 **T_pipeline_ilu3_elu2_red       , **Y_pipeline_ilu3_elu2_red;
-    uint8 **T_pipeline_ilu3_elu2_red_factor, **Y_pipeline_ilu3_elu2_red_factor;
+    inputFile_max = fopen( bench_max, "a" );
+    if ( inputFile_max == NULL ) {
+        fprintf( stderr, "Cannot open file inputFile_max \n" );
+        exit( 0 );
+    }
+    inputFile_fusion = fopen( bench_fusion, "a" );
+    if ( inputFile_fusion == NULL ) {
+        fprintf( stderr, "Cannot open file bench_fusion \n" );
+        exit( 0 );
+    }
+    inputFile_pipeline = fopen( bench_pipeline, "a" );
+    if ( inputFile_pipeline == NULL ) {
+        fprintf( stderr, "Cannot open file bench_pipeline \n" );
+        exit( 0 );
+    }
 
-    double cpp_basic;
+    puts("========================================");
+    puts("==              Script               ===");
+    puts("========================================");
 
-    double cpp_fusion;
-    double cpp_fusion_red;
-    double cpp_fusion_ilu5_red;
-    double cpp_fusion_elu2_red;
-    double cpp_fusion_elu2_red_factor;
-    double cpp_fusion_ilu5_elu2_red;
-    double cpp_fusion_ilu5_elu2_red_factor;
-    double cpp_fusion_ilu15_red;
+    char * nom_graphe_max      = "(cycle/point) selon la taille des images (MAX-Dilatation)"    ;
+    char * nom_graphe_fusion   = "(cycle/point) selon la taille des images (FUSION-Ouverture)"  ;
+    char * nom_graphe_pipeline = "(cycle/point) selon la taille des images (PIPELINE-Ouverture)";
 
-    double cpp_pipeline_basic;
-    double cpp_pipeline_red;
-    double cpp_pipeline_ilu3_red;
-    double cpp_pipeline_elu2_red;
-    double cpp_pipeline_elu2_red_factor;
-    double cpp_pipeline_ilu3_elu2_red;
-    double cpp_pipeline_ilu3_elu2_red_factor;
+    char * line_de_commande_max       = "python3 graphique.py bench_resultats/bench_max_tableau.txt cyclePpoint_selon_la_taille_des_images_MAXDilatation max";
+    char * line_de_commande_fusion    = "python3 graphique.py bench_resultats/bench_fusion_tableau.txt cyclePpoint_selon_la_taille_des_images_FUSION_ouverture fusion";
+    char * line_de_commande_pipeline  = "python3 graphique.py bench_resultats/bench_pipeline_tableau.txt cyclePpoint_selon_la_taille_des_images_PIPELINE_ouverture pipeline";
+
+    // sprintf(line_de_commande_max,       "python3 graphique.py %s %s", bench_max     , nom_graphe_max      );
+    // sprintf(line_de_commande_fusion,    "python3 graphique.py %s %s", bench_fusion  , nom_graphe_fusion   );
+    // sprintf(line_de_commande_pipeline,  "python3 graphique.py %s %s", bench_pipeline, nom_graphe_pipeline );
 
 
-    char * line_de_commande = "";
-    char* format = "%8.2f";
-
+    puts("========================================");
+    puts("==      format d'affichage           ===");
+    puts("========================================");
+    char * format = "%8.2f";
     format = "%5.0f";
     format = "%6.1f";
+    char * formatFichier = "%6.1f ";
 
-    puts("=============================");
-    puts("==    bench_morpho_max    ===");
-    puts("=============================");
+    puts("========================================");
+    puts("==    bench_morpho_max allocation    ===");
+    puts("========================================");
 
     uint8 **Y_bas, **Y_reg, **Y_rot, **Y_red, **Y_ilu3, **Y_ilu3r, **Y_elu2r, **Y_elu2rf,**Y_ilu3_elu2r, **Y_ilu3_elu2rf;
 
@@ -823,12 +832,46 @@ void bench_morpho_ouverture(int n0, int n1, int nstep)
 
 
 
-    puts("=============================");
-    puts("== bench_morpho_ouverture ===");
-    puts("=============================");
+    puts("========================================");
+    puts("== bench_morpho_ouverture allocation ===");
+    puts("========================================");
+    uint8 **T_basic;
 
-    puts("malloc");
+    uint8 **Y_basic;
+    uint8 **Y_fusion;
+    uint8 **Y_fusion_ilu5_red;
+    uint8 **Y_fusion_ilu5_elu2_red;
+    uint8 **Y_fusion_ilu5_elu2_red_factor;
+    uint8 **Y_fusion_ilu15_red;
 
+    uint8 **T_pipeline                     , **Y_pipeline;
+    uint8 **T_pipeline_red                 , **Y_pipeline_red;
+    uint8 **T_pipeline_ilu3_red            , **Y_pipeline_ilu3_red;
+    uint8 **T_pipeline_elu2_red            , **Y_pipeline_elu2_red;
+    uint8 **T_pipeline_elu2_red_factor     , **Y_pipeline_elu2_red_factor;
+    uint8 **T_pipeline_ilu3_elu2_red       , **Y_pipeline_ilu3_elu2_red;
+    uint8 **T_pipeline_ilu3_elu2_red_factor, **Y_pipeline_ilu3_elu2_red_factor;
+
+    double cpp_basic;
+
+    double cpp_fusion;
+    double cpp_fusion_red;
+    double cpp_fusion_ilu5_red;
+    double cpp_fusion_elu2_red;
+    double cpp_fusion_elu2_red_factor;
+    double cpp_fusion_ilu5_elu2_red;
+    double cpp_fusion_ilu5_elu2_red_factor;
+    double cpp_fusion_ilu15_red;
+
+    double cpp_pipeline_basic;
+    double cpp_pipeline_red;
+    double cpp_pipeline_ilu3_red;
+    double cpp_pipeline_elu2_red;
+    double cpp_pipeline_elu2_red_factor;
+    double cpp_pipeline_ilu3_elu2_red;
+    double cpp_pipeline_ilu3_elu2_red_factor;
+
+    // puts("malloc");
     // X 2r-border
     X      = ui8matrix(0-2*r, h-1+2*r, 0-2*r, w1-1+2*r);
 
@@ -888,7 +931,6 @@ void bench_morpho_ouverture(int n0, int n1, int nstep)
     zero_ui8matrix(Y_pipeline_ilu3_elu2_red_factor, 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
 
     puts("temps de calcul en ccp (cycle/point)");
-    puts("MAX");
 
 
     for(int n = n0; n <= n1; n += nstep) {
@@ -899,6 +941,10 @@ void bench_morpho_ouverture(int n0, int n1, int nstep)
 
         //printf("i = %3d\n", n);
         resize_ui8matrix(X , 0-2*r, h-1+2*r, 0-2*r, w1-1+2*r);
+
+        // puts("==========================================");
+        // puts("== bench_morpho_ouverture reallocation ===");
+        // puts("==========================================");
 
         // T 1r-border
         resize_ui8matrix(T_basic                        , 0-1*r, h-1+1*r, 0-1*r, w1-1+1*r);
@@ -926,8 +972,10 @@ void bench_morpho_ouverture(int n0, int n1, int nstep)
         resize_ui8matrix(Y_pipeline_ilu3_elu2_red       , 0, h-1, 0, w1-1);
         resize_ui8matrix(Y_pipeline_ilu3_elu2_red_factor, 0, h-1, 0, w1-1);
 
+        // puts("==========================================");
+        // puts("==    bench_morpho_max reallocation    ===");
+        // puts("==========================================");
 
-        // MAX ===========================================================================================
         resize_ui8matrix(Y_bas        , 0, h-1, 0, w1-1);
         resize_ui8matrix(Y_reg        , 0, h-1, 0, w1-1);
         resize_ui8matrix(Y_rot        , 0, h-1, 0, w1-1);
@@ -939,8 +987,34 @@ void bench_morpho_ouverture(int n0, int n1, int nstep)
         resize_ui8matrix(Y_ilu3_elu2r , 0, h-1, 0, w1-1);
         resize_ui8matrix(Y_ilu3_elu2rf, 0, h-1, 0, w1-1);
 
-        // BENCH(max3_ui8matrix_basic                               (X, 0, h-1, 0, w0-1,          Y_basic),  n ,    cpp_basic      );
 
+        // puts("====================================");
+        // puts("==        Bench référence        ===");
+        // puts("====================================");
+        BENCH(max3_ui8matrix_basic                               (X, 0, h-1, 0, w0-1,          Y_basic),  n ,    cpp_basic      );
+
+        // puts("====================================");
+        // puts("==  bench_morpho_ouverture TEST  ===");
+        // puts("====================================");
+
+        BENCH(ouverture3_ui8matrix_basic                      (X, 0, h-1, 0, w1-1, T_basic, Y_basic                      ), n, cpp_basic                      );
+        BENCH(ouverture3_ui8matrix_fusion                     (X, 0, h-1, 0, w1-1,          Y_fusion                     ), n, cpp_fusion                     );
+        BENCH(ouverture3_ui8matrix_fusion_ilu5_red            (X, 0, h-1, 0, w1-1,          Y_fusion_ilu5_red            ), n, cpp_fusion_ilu5_red            );
+        BENCH(ouverture3_ui8matrix_fusion_ilu5_elu2_red       (X, 0, h-1, 0, w1-1,          Y_fusion_ilu5_elu2_red       ), n, cpp_fusion_ilu5_elu2_red       );
+        BENCH(ouverture3_ui8matrix_fusion_ilu5_elu2_red_factor(X, 0, h-1, 0, w1-1,          Y_fusion_ilu5_elu2_red_factor), n, cpp_fusion_ilu5_elu2_red_factor);
+        BENCH(ouverture3_ui8matrix_fusion_ilu15_red           (X, 0, h-1, 0, w1-1,          Y_fusion_ilu15_red           ), n, cpp_fusion_ilu15_red           );
+
+        BENCH(ouverture3_ui8matrix_pipeline_basic               (X, 0, h-1, 0, w1-1, T_pipeline                     , Y_pipeline                     ), n, cpp_pipeline_basic               );
+        BENCH(ouverture3_ui8matrix_pipeline_red                 (X, 0, h-1, 0, w1-1, T_pipeline_red                 , Y_pipeline_red                 ), n, cpp_pipeline_red                 );
+        BENCH(ouverture3_ui8matrix_pipeline_ilu3_red            (X, 0, h-1, 0, w1-1, T_pipeline_ilu3_red            , Y_pipeline_ilu3_red            ), n, cpp_pipeline_ilu3_red            );
+        BENCH(ouverture3_ui8matrix_pipeline_elu2_red            (X, 0, h-1, 0, w1-1, T_pipeline_elu2_red            , Y_pipeline_elu2_red            ), n, cpp_pipeline_elu2_red            );
+        BENCH(ouverture3_ui8matrix_pipeline_elu2_red_factor     (X, 0, h-1, 0, w1-1, T_pipeline_elu2_red_factor     , Y_pipeline_elu2_red_factor     ), n, cpp_pipeline_elu2_red_factor     );
+        BENCH(ouverture3_ui8matrix_pipeline_ilu3_elu2_red       (X, 0, h-1, 0, w1-1, T_pipeline_ilu3_elu2_red       , Y_pipeline_ilu3_elu2_red       ), n, cpp_pipeline_ilu3_elu2_red       );
+        BENCH(ouverture3_ui8matrix_pipeline_ilu3_elu2_red_factor(X, 0, h-1, 0, w1-1, T_pipeline_ilu3_elu2_red_factor, Y_pipeline_ilu3_elu2_red_factor), n, cpp_pipeline_ilu3_elu2_red_factor);
+
+        // puts("==================================");
+        // puts("==    bench_morpho_max TEST    ===");
+        // puts("==================================");
 
         BENCH(min3_ui8matrix_basic               (X, 0, h-1, 0, w0-1, Y_bas        ), n, cpp_max_basic);
         BENCH(min3_ui8matrix_reg                 (X, 0, h-1, 0, w0-1, Y_reg        ), n, cpp_max_reg);
@@ -952,25 +1026,13 @@ void bench_morpho_ouverture(int n0, int n1, int nstep)
         BENCH(min3_ui8matrix_elu2_red_factor     (X, 0, h-1, 0, w0-1, Y_elu2rf     ), n, cpp_max_elu2_red_factor);
         BENCH(min3_ui8matrix_ilu3_elu2_red       (X, 0, h-1, 0, w0-1, Y_ilu3_elu2r ), n, cpp_max_ilu3_elu2_red);
         BENCH(min3_ui8matrix_ilu3_elu2_red_factor(X, 0, h-1, 0, w0-1, Y_ilu3_elu2rf), n, cpp_max_ilu3_elu2_red_factor);
-        // MAX ===========================================================================================
-
-        // BENCH(ouverture3_ui8matrix_basic                      (X, 0, h-1, 0, w1-1, T_basic, Y_basic                      ), n, cpp_basic                      );
-        // BENCH(ouverture3_ui8matrix_fusion                     (X, 0, h-1, 0, w1-1,          Y_fusion                     ), n, cpp_fusion                     );
-        // BENCH(ouverture3_ui8matrix_fusion_ilu5_red            (X, 0, h-1, 0, w1-1,          Y_fusion_ilu5_red            ), n, cpp_fusion_ilu5_red            );
-        // BENCH(ouverture3_ui8matrix_fusion_ilu5_elu2_red       (X, 0, h-1, 0, w1-1,          Y_fusion_ilu5_elu2_red       ), n, cpp_fusion_ilu5_elu2_red       );
-        // BENCH(ouverture3_ui8matrix_fusion_ilu5_elu2_red_factor(X, 0, h-1, 0, w1-1,          Y_fusion_ilu5_elu2_red_factor), n, cpp_fusion_ilu5_elu2_red_factor);
-        // BENCH(ouverture3_ui8matrix_fusion_ilu15_red           (X, 0, h-1, 0, w1-1,          Y_fusion_ilu15_red           ), n, cpp_fusion_ilu15_red           );
-        //
-        // BENCH(ouverture3_ui8matrix_pipeline_basic               (X, 0, h-1, 0, w1-1, T_pipeline                     , Y_pipeline                     ), n, cpp_pipeline_basic               );
-        // BENCH(ouverture3_ui8matrix_pipeline_red                 (X, 0, h-1, 0, w1-1, T_pipeline_red                 , Y_pipeline_red                 ), n, cpp_pipeline_red                 );
-        // BENCH(ouverture3_ui8matrix_pipeline_ilu3_red            (X, 0, h-1, 0, w1-1, T_pipeline_ilu3_red            , Y_pipeline_ilu3_red            ), n, cpp_pipeline_ilu3_red            );
-        // BENCH(ouverture3_ui8matrix_pipeline_elu2_red            (X, 0, h-1, 0, w1-1, T_pipeline_elu2_red            , Y_pipeline_elu2_red            ), n, cpp_pipeline_elu2_red            );
-        // BENCH(ouverture3_ui8matrix_pipeline_elu2_red_factor     (X, 0, h-1, 0, w1-1, T_pipeline_elu2_red_factor     , Y_pipeline_elu2_red_factor     ), n, cpp_pipeline_elu2_red_factor     );
-        // BENCH(ouverture3_ui8matrix_pipeline_ilu3_elu2_red       (X, 0, h-1, 0, w1-1, T_pipeline_ilu3_elu2_red       , Y_pipeline_ilu3_elu2_red       ), n, cpp_pipeline_ilu3_elu2_red       );
-        // BENCH(ouverture3_ui8matrix_pipeline_ilu3_elu2_red_factor(X, 0, h-1, 0, w1-1, T_pipeline_ilu3_elu2_red_factor, Y_pipeline_ilu3_elu2_red_factor), n, cpp_pipeline_ilu3_elu2_red_factor);
 
         /**/
         // printf("i = %4d", n);
+
+        // puts("=========================================");
+        // puts("==  bench_morpho_ouverture RESULTATS  ===");
+        // puts("=========================================");
         // printf("   ");
         // printf(format, cpp_basic                      );
         // printf(format, cpp_fusion                     );
@@ -989,6 +1051,11 @@ void bench_morpho_ouverture(int n0, int n1, int nstep)
         // printf(format, cpp_pipeline_ilu3_elu2_red              );
         // printf(format, cpp_pipeline_ilu3_elu2_red_factor       );
 
+        // puts("=======================================");
+        // puts("==    bench_morpho_max RESULTATS    ===");
+        // puts("=======================================");
+        // printf("   ");
+        //
         // printf(format, cpp_max_basic                      );
         // printf(format, cpp_max_reg                        );
         // printf(format, cpp_max_rot                        );
@@ -1002,25 +1069,48 @@ void bench_morpho_ouverture(int n0, int n1, int nstep)
         // putchar('\n');
 
 
-        char * nomfichier = "bench_resultats/test1.txt";
-        char * line_de_commande = "";
-        FILE * inputFile;
-        inputFile = fopen( nomfichier, "a" );
-        if ( inputFile == NULL ) {
-            fprintf( stderr, "Cannot open file \n" );
-            exit( 0 );
-        }
-        fprintf( inputFile, "%d %6.1f %6.1f %6.1f %6.1f %6.1f %6.1f %6.1f %6.1f %6.1f\n", n,
-        cpp_max_basic, cpp_max_reg, cpp_max_rot, cpp_max_red, cpp_max_ilu3_red, cpp_max_elu2_red,
+        // puts("=======================================");
+        // puts("==    bench_morpho_max -> FICHIER    ===");
+        // puts("=======================================");
+
+        fprintf( inputFile_max, "%d %6.1f %6.1f %6.1f %6.1f %6.1f %6.1f %6.1f %6.1f %6.1f\n",
+        n,cpp_max_basic, cpp_max_reg, cpp_max_rot, cpp_max_red, cpp_max_ilu3_red, cpp_max_elu2_red,
         cpp_max_elu2_red_factor, cpp_max_ilu3_elu2_red, cpp_max_ilu3_elu2_red_factor);
 
-        fclose( inputFile );
+        // puts("=========================================");
+        // puts("==  bench_morpho_ouverture RESULTATS  ===");
+        // puts("=========================================");
+        printf("   ");
+        fprintf(inputFile_fusion,     "%d ",         n                         );
+        fprintf(inputFile_fusion,formatFichier, cpp_basic                      );
+        fprintf(inputFile_fusion,formatFichier, cpp_fusion                     );
+        fprintf(inputFile_fusion,formatFichier, cpp_fusion_ilu5_red            );
+        fprintf(inputFile_fusion,formatFichier, cpp_fusion_ilu5_elu2_red       );
+        fprintf(inputFile_fusion,formatFichier, cpp_fusion_ilu5_elu2_red_factor);
+        fprintf(inputFile_fusion,formatFichier, cpp_fusion_ilu15_red           );
+        fprintf(inputFile_fusion,       "\n"                                   );
 
-        fprintf(line_de_commande, "python3 graphique.py %s", nomfichier);
+        fprintf(inputFile_pipeline,     "%d ",         n                                  );
+        fprintf(inputFile_pipeline,formatFichier, cpp_basic                               );
+        fprintf(inputFile_pipeline,formatFichier, cpp_pipeline_basic                      );
+        fprintf(inputFile_pipeline,formatFichier, cpp_pipeline_red                        );
+        fprintf(inputFile_pipeline,formatFichier, cpp_pipeline_ilu3_red                   );
+        fprintf(inputFile_pipeline,formatFichier, cpp_pipeline_elu2_red                   );
+        fprintf(inputFile_pipeline,formatFichier, cpp_pipeline_elu2_red_factor            );
+        fprintf(inputFile_pipeline,formatFichier, cpp_pipeline_ilu3_elu2_red              );
+        fprintf(inputFile_pipeline,formatFichier, cpp_pipeline_ilu3_elu2_red_factor       );
+        fprintf(inputFile_pipeline,       "\n"                                            );
 
     }
 
-    system(line_de_commande);
+    fclose(  inputFile_max       );
+    fclose(  inputFile_fusion    );
+    fclose(  inputFile_pipeline  );
+
+    system( line_de_commande_max      );
+    system( line_de_commande_fusion   );
+    system( line_de_commande_pipeline );
+
 
 }
 // ====================================
