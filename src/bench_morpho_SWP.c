@@ -16,6 +16,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 
 #include "nrtype.h"
 #include "nrdef.h"
@@ -60,17 +61,27 @@ void bench_morpho_routine_swp(int n0, int n1, int nstep)
     puts("========================================");
     puts("==       Ouverture du fichier        ===");
     puts("========================================");
-    char * bench_max      = "bench_resultats/bench_max_tableau.txt"       ;
-    char * bench_SWP_max  = "bench_resultats/bench_SWP_max_tableau.txt"   ;
+    char * bench_max        = "bench_resultats/bench_max_tableau.txt"                  ;
+    char * bench_max_s      = "bench_resultats/bench_max_tableau_secondes.txt"         ;
+    char * bench_SWP_max    = "bench_resultats/bench_SWP_max_tableau.txt"              ;
+    char * bench_SWP_max_s  = "bench_resultats/bench_SWP_max_tableau_secondes.txt"     ;
 
 
     FILE * inputFile_max;
+    FILE * inputFile_max_s;
     FILE * inputFile_SWP_max;
+    FILE * inputFile_SWP_max_s;
 
 
     inputFile_max = fopen( bench_max, "a" );
     if ( inputFile_max == NULL ) {
         fprintf( stderr, "Cannot open file inputFile_max \n" );
+        exit( 0 );
+    }
+
+    inputFile_max_s = fopen( bench_max_s, "a" );
+    if ( inputFile_max_s == NULL ) {
+        fprintf( stderr, "Cannot open file inputFile_max_s \n" );
         exit( 0 );
     }
 
@@ -80,16 +91,28 @@ void bench_morpho_routine_swp(int n0, int n1, int nstep)
         exit( 0 );
     }
 
+    inputFile_SWP_max_s = fopen( bench_SWP_max_s, "a" );
+    if ( inputFile_SWP_max_s == NULL ) {
+        fprintf( stderr, "Cannot open file inputFile_SWP_max \n" );
+        exit( 0 );
+    }
+
     puts("========================================");
     puts("==              Script               ===");
     puts("========================================");
 
     char * nom_graphe_max      = "(cycle/point) selon la taille des images (MAX-Dilatation)";
+    char * nom_graphe_max_s    = "(cycle/point) selon la taille des images (MAX-Dilatation) seconde";
     char * nom_graphe_SWP_max  = "(cycle/point) selon la taille des images (SWP_max-Dilatation)";
+    char * nom_graphe_SWP_max_s= "(cycle/point) selon la taille des images (SWP_max-Dilatation) seconde";
+
 
 
     char * line_de_commande_max       = "python3 graphique.py bench_resultats/bench_max_tableau.txt cyclePpoint_selon_la_taille_des_images_MAXDilatation max";
+    char * line_de_commande_max_s     = "python3 graphique.py bench_resultats/bench_max_tableau_secondes.txt cyclePpoint_selon_la_taille_des_images_MAXDilatation_seconde max";
     char * line_de_commande_SWP_MAX   = "python3 graphique.py bench_resultats/bench_SWP_max_tableau.txt cyclePpoint_selon_la_taille_des_images_SWPMAX_Dilatation swp_max";
+    char * line_de_commande_SWP_MAX_s = "python3 graphique.py bench_resultats/bench_SWP_max_tableau_secondes.txt cyclePpoint_selon_la_taille_des_images_SWPMAX_Dilatation_seconde swp_max";
+
 
     // sprintf(line_de_commande_max,       "python3 graphique.py %s %s", bench_max     , nom_graphe_max      );
     // sprintf(line_de_commande_fusion,    "python3 graphique.py %s %s", bench_fusion  , nom_graphe_fusion   );
@@ -145,6 +168,18 @@ void bench_morpho_routine_swp(int n0, int n1, int nstep)
     double cpp_max_ilu3_elu2_red;
     double cpp_max_ilu3_elu2_red_factor;
 
+    double s_max_basic;
+    double s_max_reg;
+    double s_max_rot;
+    double s_max_red;
+    double s_max_ilu3;
+    double s_max_ilu3_red;
+    double s_max_elu2;
+    double s_max_elu2_red;
+    double s_max_elu2_red_factor;
+    double s_max_ilu3_elu2_red;
+    double s_max_ilu3_elu2_red_factor;
+
     puts("============================================");
     puts("==    bench_morpho_SWP_max allocation    ===");
     puts("============================================");
@@ -173,6 +208,10 @@ void bench_morpho_routine_swp(int n0, int n1, int nstep)
     double cpp_SWP_max_rot_uint8;
     double cpp_SWP_max_rot_uint16;
     double cpp_SWP_max_rot_uint32;
+
+    double s_SWP_max_rot_uint8;
+    double s_SWP_max_rot_uint16;
+    double s_SWP_max_rot_uint32;
 
 
     // puts("malloc");
@@ -225,6 +264,7 @@ void bench_morpho_routine_swp(int n0, int n1, int nstep)
         // puts("==        Bench référence        ===");
         // puts("====================================");
         BENCH(max3_ui8matrix_basic               (X, 0, h-1, 0, w0-1, Y_bas        ), n, cpp_max_basic);
+        BENCH_secondes(max3_ui8matrix_basic               (X, 0, h-1, 0, w0-1, Y_bas        ), n, s_max_basic);
 
         // puts("======================================");
         // puts("==    bench_morpho_SWP_max TEST    ===");
@@ -233,6 +273,12 @@ void bench_morpho_routine_swp(int n0, int n1, int nstep)
         BENCH(max3_ui8matrix_swp_rotation (X, h, w1_8, 0, h-1, 0, w8-1,  Y8_rotation,   Y8_rotation_unpack) , n , cpp_SWP_max_rot_uint8) ;
         BENCH(max3_ui16matrix_swp_rotation(X, h, w1_8, 0, h-1, 0, w16-1, Y16_rotation,  Y16_rotation_unpack), n , cpp_SWP_max_rot_uint16);
         BENCH(max3_ui32matrix_swp_rotation(X, h, w1_8, 0, h-1, 0, w32-1, Y32_rotation,  Y32_rotation_unpack), n , cpp_SWP_max_rot_uint32);
+
+        BENCH_secondes(max3_ui8matrix_swp_rotation (X, h, w1_8, 0, h-1, 0, w8-1,  Y8_rotation,   Y8_rotation_unpack) , n , s_SWP_max_rot_uint8) ;
+        BENCH_secondes(max3_ui16matrix_swp_rotation(X, h, w1_8, 0, h-1, 0, w16-1, Y16_rotation,  Y16_rotation_unpack), n , s_SWP_max_rot_uint16);
+        BENCH_secondes(max3_ui32matrix_swp_rotation(X, h, w1_8, 0, h-1, 0, w32-1, Y32_rotation,  Y32_rotation_unpack), n , s_SWP_max_rot_uint32);
+
+
         // puts("==================================");
         // puts("==    bench_morpho_max TEST    ===");
         // puts("==================================");
@@ -246,6 +292,17 @@ void bench_morpho_routine_swp(int n0, int n1, int nstep)
         BENCH(max3_ui8matrix_elu2_red_factor     (X, 0, h-1, 0, w0-1, Y_elu2rf     ), n, cpp_max_elu2_red_factor);
         BENCH(max3_ui8matrix_ilu3_elu2_red       (X, 0, h-1, 0, w0-1, Y_ilu3_elu2r ), n, cpp_max_ilu3_elu2_red);
         BENCH(max3_ui8matrix_ilu3_elu2_red_factor(X, 0, h-1, 0, w0-1, Y_ilu3_elu2rf), n, cpp_max_ilu3_elu2_red_factor);
+
+        BENCH_secondes(max3_ui8matrix_reg                 (X, 0, h-1, 0, w0-1, Y_reg        ), n, s_max_reg);
+        BENCH_secondes(max3_ui8matrix_rot                 (X, 0, h-1, 0, w0-1, Y_rot        ), n, s_max_rot);
+        BENCH_secondes(max3_ui8matrix_red                 (X, 0, h-1, 0, w0-1, Y_red        ), n, s_max_red);
+        BENCH_secondes(max3_ui8matrix_ilu3                (X, 0, h-1, 0, w0-1, Y_ilu3       ), n, s_max_ilu3);
+        BENCH_secondes(max3_ui8matrix_ilu3_red            (X, 0, h-1, 0, w0-1, Y_ilu3r      ), n, s_max_ilu3_red);
+        BENCH_secondes(max3_ui8matrix_elu2_red            (X, 0, h-1, 0, w0-1, Y_elu2r      ), n, s_max_elu2_red);
+        BENCH_secondes(max3_ui8matrix_elu2_red_factor     (X, 0, h-1, 0, w0-1, Y_elu2rf     ), n, s_max_elu2_red_factor);
+        BENCH_secondes(max3_ui8matrix_ilu3_elu2_red       (X, 0, h-1, 0, w0-1, Y_ilu3_elu2r ), n, s_max_ilu3_elu2_red);
+        BENCH_secondes(max3_ui8matrix_ilu3_elu2_red_factor(X, 0, h-1, 0, w0-1, Y_ilu3_elu2rf), n, s_max_ilu3_elu2_red_factor);
+
 
         /**/
         printf("i = %4d\n", n);
@@ -282,28 +339,55 @@ void bench_morpho_routine_swp(int n0, int n1, int nstep)
         // puts("==    bench_morpho_max -> FICHIER    ===");
         // puts("=======================================");
         //
-        fprintf( inputFile_max, "%d %6.1f %6.1f %6.1f %6.1f %6.1f %6.1f %6.1f %6.1f %6.1f\n",
-        n,cpp_max_basic, cpp_max_reg, cpp_max_rot, cpp_max_red, cpp_max_ilu3_red, cpp_max_elu2_red,
-        cpp_max_elu2_red_factor, cpp_max_ilu3_elu2_red, cpp_max_ilu3_elu2_red_factor);
-        //
+        // fprintf( inputFile_max, "%d %6.1f %6.1f %6.1f %6.1f %6.1f %6.1f %6.1f %6.1f %6.1f\n",
+        // n,cpp_max_basic, cpp_max_reg, cpp_max_rot, cpp_max_red, cpp_max_ilu3_red, cpp_max_elu2_red,
+        // cpp_max_elu2_red_factor, cpp_max_ilu3_elu2_red, cpp_max_ilu3_elu2_red_factor);
+
+        fprintf(inputFile_max_s,   "%d " ,     n                            );
+        fprintf(inputFile_max_s, "%0.8f ", s_max_basic                      );
+        fprintf(inputFile_max_s, "%0.8f ", s_max_reg                        );
+        fprintf(inputFile_max_s, "%0.8f ", s_max_rot                        );
+        fprintf(inputFile_max_s, "%0.8f ", s_max_red                        );
+        fprintf(inputFile_max_s, "%0.8f ", s_max_ilu3_red                   );
+        fprintf(inputFile_max_s, "%0.8f ", s_max_elu2_red                   );
+        fprintf(inputFile_max_s, "%0.8f ", s_max_elu2_red_factor            );
+        fprintf(inputFile_max_s, "%0.8f ", s_max_ilu3_elu2_red              );
+        fprintf(inputFile_max_s, "%0.8f ", s_max_ilu3_elu2_red_factor       );
+        fprintf(inputFile_max_s,     "\n"                                   );
+
+
 
         // puts("========================================");
         // puts("==  bench_SWP_morpho_max -> FICHIER  ===");
         // puts("========================================");
-        fprintf(inputFile_SWP_max,     "%d ",         n                         );
-        fprintf(inputFile_SWP_max,formatFichier, cpp_max_basic                  );
-        fprintf(inputFile_SWP_max,formatFichier, cpp_SWP_max_rot_uint8          );
-        fprintf(inputFile_SWP_max,formatFichier, cpp_SWP_max_rot_uint16         );
-        fprintf(inputFile_SWP_max,formatFichier, cpp_SWP_max_rot_uint32         );
-        fprintf(inputFile_SWP_max,     "\n"                                     );
+        // fprintf(inputFile_SWP_max,     "%d ",         n                         );
+        // fprintf(inputFile_SWP_max,formatFichier, cpp_max_basic                  );
+        // fprintf(inputFile_SWP_max,formatFichier, cpp_SWP_max_rot_uint8          );
+        // fprintf(inputFile_SWP_max,formatFichier, cpp_SWP_max_rot_uint16         );
+        // fprintf(inputFile_SWP_max,formatFichier, cpp_SWP_max_rot_uint32         );
+        // fprintf(inputFile_SWP_max,     "\n"
+
+        fprintf(inputFile_SWP_max_s,   "%d ",      n                       );
+        fprintf(inputFile_SWP_max_s,"%0.8f ", s_max_basic                  );
+        fprintf(inputFile_SWP_max_s,"%0.8f ", s_SWP_max_rot_uint8          );
+        fprintf(inputFile_SWP_max_s,"%0.8f ", s_SWP_max_rot_uint16         );
+        fprintf(inputFile_SWP_max_s,"%0.8f ", s_SWP_max_rot_uint32         );
+        fprintf(inputFile_SWP_max_s,     "\n"                              );
 
     }
 
-    fclose(  inputFile_max       );
-    fclose(  inputFile_SWP_max  );
+    // fclose(  inputFile_max        );
+    fclose(  inputFile_max_s      );
+    // fclose(  inputFile_SWP_max    );
+    fclose(  inputFile_SWP_max_s  );
 
-    system( line_de_commande_max      );
-    system( line_de_commande_SWP_MAX  );
+
+    // system( line_de_commande_max        );
+    system( line_de_commande_max_s      );
+    // system( line_de_commande_SWP_MAX    );
+    system( line_de_commande_SWP_MAX_s  );
+
+
 }
 
 

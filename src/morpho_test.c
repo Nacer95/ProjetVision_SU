@@ -943,7 +943,7 @@ void bench_morpho_ouverture(int n0, int n1, int nstep)
         // puts("==        Bench référence        ===");
         // puts("====================================");
 
-        BENCH(ouverture3_ui8matrix_basic                         (X, 0, h-1, 0, w1-1, T_basic, Y_basic), n  ,    cpp_basic      );
+        BENCH(ouverture3_ui8matrix_basic                      (X, 0, h-1, 0, w1-1, T_basic, Y_basic), n  ,    cpp_basic      );
 
         // puts("====================================");
         // puts("==  bench_morpho_ouverture TEST  ===");
