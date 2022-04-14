@@ -26,6 +26,8 @@
 #include "morpho_test.h"
 #include "motion_test.h"
 #include "test_morpho_SWP.h"
+#include "bench_morpho_SWP.h"
+
 
 /* --------------- */
 int getIter(int size)
@@ -78,8 +80,9 @@ int main(int argc, char *argv[])
 {
 
     // test_swp(argc, argv);
+    bench_morpho_swp(argc, argv);
 
-    test_morpho(argc, argv);
+    // test_morpho(argc, argv);
     // test_motion(argc, argv);
     return 0;
 }

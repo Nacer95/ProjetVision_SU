@@ -55,9 +55,24 @@ void test_morpho_SWP_max_routine(int h, int w0){
   //w1 la taille de la matrice au multiple de 8 le plus proche
   //w8 la taille de la matrice compactée
 
+
   puts("--------------------------------------------------");
   printf("test_morpho_SWP_routine h = %d w0 = %d w8 = %d, w1_8 = %d\n", h, w0, w8, w1_8);
   //if(w1 > w0) puts("w1 > w0");
+
+  // char * bench_SWP_max  = "bench_resultats/bench_SWP_max_tableau.txt"   ;
+  // FILE * inputFile_SWP_max;
+  // inputFile_SWP_max = fopen( bench_pipeline, "a" );
+  // if ( inputFile_pipeline == NULL ) {
+  //     fprintf( stderr, "Cannot open file inputFile_SWP_max \n" );
+  //     exit( 0 );
+  // }
+  //
+  // puts("========================================");
+  // puts("==              Script               ===");
+  // puts("========================================");
+  // char * nom_graphe_SWP_max  = "(cycle/point) selon la taille des images (SWP_max-Dilatation)";
+  // char * line_de_commande_pipeline  = "python3 graphique.py bench_resultats/bench_SWP_max_tableau.txt cyclePpoint_selon_la_taille_des_images_SWPMAX_Dilatation";
 
   uint8 **X;
   uint8 **X8, **X1;

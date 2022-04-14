@@ -9,7 +9,8 @@ dict_focntion = {
     'fusion': ["cpp_basic", "cpp_fusion", "cpp_fusion_ilu5_red", "cpp_fusion_ilu5_elu2_red",
                "cpp_fusion_ilu5_elu2_red_factor", "cpp_fusion_ilu15_red"],
     'pipeline': ["cpp_basic","cpp_pipeline_basic","cpp_pipeline_red","cpp_pipeline_ilu3_red",
-                 "cpp_pipeline_elu2_red","cpp_pipeline_elu2_red_factor","cpp_pipeline_ilu3_elu2_red","cpp_pipeline_ilu3_elu2_red_factor"]
+                 "cpp_pipeline_elu2_red","cpp_pipeline_elu2_red_factor","cpp_pipeline_ilu3_elu2_red","cpp_pipeline_ilu3_elu2_red_factor"],
+    'swp_max': ["cpp_max_basic","cpp_SWP_max_rot_uint8","cpp_SWP_max_rot_uint16","cpp_SWP_max_rot_uint32"]
 
 }
 
