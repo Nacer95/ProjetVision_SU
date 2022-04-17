@@ -10,6 +10,8 @@
 #include "nrtype.h"
 #include "nrdef.h"
 #include "nrutil.h"
+#include "macro_bench.h"
+#include "x86intrin.h" // _rdtsc()
 
 #include "sigmadelta.h"
 #include "morpho_min.h"
@@ -151,6 +153,19 @@ void motion_detection_morpho_v1(void)
     char complete_filename_dilatation1[1024];
     char complete_filename_dilatation2[1024];
 
+    // BENCH  =============================================
+    // double cpp_SD_basic;
+    // double cpp_SD_oneFor;
+    // double cpp_SD_oneFor_reg;
+    //
+    // double somme_cpp = 0;
+    //
+    // double s_SD_basic;
+    // double s_SD_oneFor;
+    // double s_SD_oneFor_reg;
+    // double somme_s = 0;
+    // int i = 0;
+
     // -------
     // -- init
     // -------
@@ -180,8 +195,6 @@ void motion_detection_morpho_v1(void)
     // int w8  = w / 8 ; if(w % 8)  {w8 = w8+1 ;  j1 =  8*w8 ;}
     // int w16 = w / 16; if(w % 16) {w16 = w16+1; j1 = 16*w16;}
     int w32 = w / 32; if(w % 32) {w32 = w32+1; j1 = 32*w32;}
-
-
 
 
     // ----------------
@@ -318,8 +331,25 @@ void motion_detection_morpho_v1(void)
         generate_path_filename_k_ndigit_extension(src_path, filename, t, ndigit, "pgm", complete_filename_I);
         MLoadPGM_ui8matrix(complete_filename_I, i0, i1, j0, j1, I); // modification de I
 
+
         // N = 3 ecart type autour de la moyenne
-        SigmaDelta_1Step_oneFor(I, M, O, V, E, 3, i0, i1, j0, j1);
+        SigmaDelta_1Step_oneFor_reg(I, M, O, V, E, 3, i0, i1, j0, j1);
+
+        // BENCH  =============================================
+        // BENCH_HxW(SigmaDelta_1Step(I, M, O, V, E, 3, i0, i1, j0, j1) ,SEQUENCE_HEIGHT, SEQUENCE_WIDTH,  cpp_SD_basic) ;
+        // BENCH_secondes(SigmaDelta_1Step(I, M, O, V, E, 3, i0, i1, j0, j1) , SEQUENCE_HEIGHT*SEQUENCE_WIDTH, s_SD_basic) ;
+
+        // BENCH_HxW(SigmaDelta_1Step_oneFor(I, M, O, V, E, 3, i0, i1, j0, j1), SEQUENCE_HEIGHT, SEQUENCE_WIDTH, cpp_SD_oneFor) ;
+        // BENCH_secondes(SigmaDelta_1Step_oneFor(I, M, O, V, E, 3, i0, i1, j0, j1), SEQUENCE_HEIGHT*SEQUENCE_WIDTH, s_SD_oneFor) ;
+
+        // BENCH_HxW(SigmaDelta_1Step_oneFor_reg(I, M, O, V, E, 3, i0, i1, j0, j1), SEQUENCE_HEIGHT, SEQUENCE_WIDTH, cpp_SD_oneFor_reg) ;
+        // BENCH_secondes(SigmaDelta_1Step_oneFor_reg(I, M, O, V, E, 3, i0, i1, j0, j1), SEQUENCE_HEIGHT*SEQUENCE_WIDTH, s_SD_oneFor_reg) ;
+
+        // somme_s += s_SD_oneFor_reg;
+        // somme_cpp += cpp_SD_oneFor_reg;
+        // i += 1;
+
+
 
         // morpho en niveau de gris fonctionnant aussi sur des images 1 bit / pixel
           //basique ============================================================
@@ -349,10 +379,10 @@ void motion_detection_morpho_v1(void)
         // unpack_ui16matrix  (Y16_erosion2       , h, w16,  Dilatation2);
           //swp32 ==============================================================
         pack_ui32matrix (E, h, w1_32, X32);
-        max3_ui32matrix_swp_rotation_trivial (X32,              h, w1_32, 0, h-1, 0, w32-1,  Y32_erosion1)    ;
-        min3_ui32matrix_swp_rotation_trivial (Y32_erosion1,     h, w1_32, 0, h-1, 0, w32-1,  Y32_dilatation1) ;
-        min3_ui32matrix_swp_rotation_trivial (Y32_dilatation1,  h, w1_32, 0, h-1, 0, w32-1,  Y32_dilatation2) ;
-        max3_ui32matrix_swp_rotation_trivial (Y32_dilatation2,  h, w1_32, 0, h-1, 0, w32-1,  Y32_erosion2)    ;
+        min3_ui32matrix_swp_rotation_trivial (X32,              h, w1_32, 0, h-1, 0, w32-1,  Y32_erosion1)    ;
+        max3_ui32matrix_swp_rotation_trivial (Y32_erosion1,     h, w1_32, 0, h-1, 0, w32-1,  Y32_dilatation1) ;
+        max3_ui32matrix_swp_rotation_trivial (Y32_dilatation1,  h, w1_32, 0, h-1, 0, w32-1,  Y32_dilatation2) ;
+        min3_ui32matrix_swp_rotation_trivial (Y32_dilatation2,  h, w1_32, 0, h-1, 0, w32-1,  Y32_erosion2)    ;
         unpack_ui32matrix  (Y32_erosion1       , h, w32,  Erosion1);
         unpack_ui32matrix  (Y32_dilatation1    , h, w32,  Erosion2);
         unpack_ui32matrix  (Y32_dilatation2    , h, w32,  Dilatation1);
@@ -396,7 +426,13 @@ void motion_detection_morpho_v1(void)
         SavePGM_ui8matrix(Dilatation1_8, i0, i1, j0, j1, complete_filename_dilatation1);
         SavePGM_ui8matrix(Dilatation2_8, i0, i1, j0, j1, complete_filename_dilatation2);
         SavePGM_ui8matrix(Erosion2_8   , i0, i1, j0, j1, complete_filename_erosion2   );
+
+
     } // t
+    ///  BENCH =================================================================
+    // printf("%f\n", somme_cpp/i );
+    // printf("%f\n", somme_s/i );
+
 
     // ----------
     // -- free --

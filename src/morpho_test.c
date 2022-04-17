@@ -199,17 +199,23 @@ void test_morpho_max_routine(int h, int w0)
     //puts("done\n");
 
     // free
-    free_ui8matrix(X ,            0-b, h-1+b, 0-b, w1-1+b);
+    free_ui8matrix(X,  0-b, h-1+b, 0-b, w1-1+b);
+    free_ui8matrix(X8,  0-b, h-1+b, 0-b, w8    );
 
-    // free_ui8matrix(Y_bas        , 0,   h-1,   0,   w1-1);
-    // free_ui8matrix(Y_reg        , 0,   h-1,   0,   w1-1);
-    // free_ui8matrix(Y_rot        , 0,   h-1,   0,   w1-1);
-    // free_ui8matrix(Y_red        , 0,   h-1,   0,   w1-1);
-    // free_ui8matrix(Y_ilu3       , 0,   h-1,   0,   w1-1);
-    // free_ui8matrix(Y_ilu3r      , 0,   h-1,   0,   w1-1);
-    // free_ui8matrix(Y_elu2r      , 0,   h-1,   0,   w1-1);
-    // free_ui8matrix(Y_elu2rf     , 0,   h-1,   0,   w1-1);
-    // free_ui8matrix(Y_ilu3_elu2rf, 0,   h-1,   0,   w1-1);
+
+    free_ui8matrix(Y_bas,         0, h-1, 0, w1-1);
+    free_ui8matrix(Y_reg,         0, h-1, 0, w1-1);
+    free_ui8matrix(Y_rot,         0, h-1, 0, w1-1);
+    free_ui8matrix(Y_red,         0, h-1, 0, w1-1);
+    free_ui8matrix(Y_ilu3,        0, h-1, 0, w1-1);
+    free_ui8matrix(Y_ilu3r,       0, h-1, 0, w1-1);
+    free_ui8matrix(Y_elu2r,       0, h-1, 0, w1-1);
+    free_ui8matrix(Y_elu2rf,      0, h-1, 0, w1-1);
+    free_ui8matrix(Y_ilu3_elu2r , 0, h-1, 0, w1-1);
+    free_ui8matrix(Y_ilu3_elu2rf, 0, h-1, 0, w1-1);
+
+
+
 }
 // ---------------------------------------
 void test_morpho_min_routine(int h, int w0)
@@ -308,16 +314,19 @@ void test_morpho_min_routine(int h, int w0)
     //puts("done\n");
 
 
-    // free_ui8matrix(X,             0-b, h-1+b, 0-b, w1-1+b);
-    // free_ui8matrix(Y_bas,         0,   h-1,   0,   w1-1);
-    // free_ui8matrix(Y_reg,         0,   h-1,   0,   w1-1);
-    // free_ui8matrix(Y_rot,         0,   h-1,   0,   w1-1);
-    // free_ui8matrix(Y_red,         0,   h-1,   0,   w1-1);
-    // free_ui8matrix(Y_ilu3,        0,   h-1,   0,   w1-1);
-    // free_ui8matrix(Y_ilu3r,       0,   h-1,   0,   w1-1);
-    // free_ui8matrix(Y_elu2r,       0,   h-1,   0,   w1-1);
-    // free_ui8matrix(Y_elu2rf,      0,   h-1,   0,   w1-1);
-    // free_ui8matrix(Y_ilu3_elu2rf, 0,   h-1,   0,   w1-1);
+    free_ui8matrix(X,  0-b, h-1+b, 0-b, w1-1+b);
+
+    free_ui8matrix(Y_bas        , 0, h-1, 0, w1-1);
+    free_ui8matrix(Y_reg        , 0, h-1, 0, w1-1);
+    free_ui8matrix(Y_rot        , 0, h-1, 0, w1-1);
+    free_ui8matrix(Y_red        , 0, h-1, 0, w1-1);
+    free_ui8matrix(Y_ilu3       , 0, h-1, 0, w1-1);
+    free_ui8matrix(Y_ilu3r      , 0, h-1, 0, w1-1);
+    free_ui8matrix(Y_elu2r      , 0, h-1, 0, w1-1);
+    free_ui8matrix(Y_elu2rf     , 0, h-1, 0, w1-1);
+    free_ui8matrix(Y_ilu3_elu2r , 0, h-1, 0, w1-1);
+    free_ui8matrix(Y_ilu3_elu2rf, 0, h-1, 0, w1-1);
+
 }
 // ----------------------------------------------
 void test_morpho_ouverture_routine(int h, int w0)
@@ -509,23 +518,33 @@ void test_morpho_ouverture_routine(int h, int w0)
     puts("-- free --");
     puts("----------");
 
-    // free_ui8matrix(X , 0-2*r, h-1+2*r, 0-2*r, w1-1+2*r);
-    // free_ui8matrix(X8, 0-2*r, h-1+2*r, 0-1*r, w8-1+1*r);
-    // free_ui8matrix(X1, 0-2*r, h-1+2*r, 0-2*r, w1-1+2*r);
-    //
-    // free_ui8matrix(T_basic,                        0-1*r, h-1+1*r, 0-1*r, w1-1+1*r);
-    // free_ui8matrix(T_pipeline,                     0-1*r, h-1+1*r, 0-1*r, w1-1+1*r);
-    // free_ui8matrix(T_pipeline_ilu3_red,            0-1*r, h-1+1*r, 0-1*r, w1-1+1*r);
-    // free_ui8matrix(T_pipeline_elu2_red_factor,     0-1*r, h-1+1*r, 0-1*r, w1-1+1*r);
+    free_ui8matrix(X , 0-2*r, h-1+2*r, 0-2*r, w1-1+2*r);
 
-    // free_ui8matrix(Y_basic                      , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
-    // free_ui8matrix(Y_fusion                     , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
-    // free_ui8matrix(Y_fusion_ilu5_red            , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
-    // free_ui8matrix(Y_fusion_ilu5_elu2_red       , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
-    // free_ui8matrix(Y_fusion_ilu5_elu2_red_factor, 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
-    // free_ui8matrix(Y_fusion_ilu15_red           , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
+    //PUTS("zero T");
+    free_ui8matrix(T_basic                        , 0-1*r, h-1+1*r, 0-1*r, w1-1+1*r);
+    free_ui8matrix(T_pipeline                     , 0-1*r, h-1+1*r, 0-1*r, w1-1+1*r);
+    free_ui8matrix(T_pipeline_red                 , 0-1*r, h-1+1*r, 0-1*r, w1-1+1*r);
+    free_ui8matrix(T_pipeline_ilu3_red            , 0-1*r, h-1+1*r, 0-1*r, w1-1+1*r);
+    free_ui8matrix(T_pipeline_elu2_red            , 0-1*r, h-1+1*r, 0-1*r, w1-1+1*r);
+    // free_ui8matrix(T_pipeline_elu2_red_factor     , 0-1*r, h-1+1*r, 0-1*r, w1-1+1*r); // pointeur non alloué pour être free
+    free_ui8matrix(T_pipeline_ilu3_elu2_red       , 0-1*r, h-1+1*r, 0-1*r, w1-1+1*r);
+    // free_ui8matrix(T_pipeline_ilu3_elu2_red_factor, 0-1*r, h-1+1*r, 0-1*r, w1-1+1*r); // pointeur non alloué pour être free
 
-    //free_ui8matrix(T_pipeline,                     0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
+    //PUTS("zero Y");
+    free_ui8matrix(Y_basic                      , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
+    free_ui8matrix(Y_fusion                     , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
+    free_ui8matrix(Y_fusion_ilu5_red            , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
+    free_ui8matrix(Y_fusion_ilu5_elu2_red       , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
+    free_ui8matrix(Y_fusion_ilu5_elu2_red_factor, 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
+    free_ui8matrix(Y_fusion_ilu15_red           , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
+
+    free_ui8matrix(Y_pipeline                     , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
+    free_ui8matrix(Y_pipeline_red                 , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
+    free_ui8matrix(Y_pipeline_ilu3_red            , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
+    free_ui8matrix(Y_pipeline_elu2_red            , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
+    // free_ui8matrix(Y_pipeline_elu2_red_factor     , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r); // pointeur non alloué pour être free
+    free_ui8matrix(Y_pipeline_ilu3_elu2_red       , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
+    // free_ui8matrix(Y_pipeline_ilu3_elu2_red_factor, 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r); // pointeur non alloué pour être free
     puts("free done");
 }
 
@@ -1102,6 +1121,37 @@ void bench_morpho_ouverture(int n0, int n1, int nstep)
     system( line_de_commande_pipeline_s );
 
 
+    //PUTS("zero X");
+    zero_ui8matrix(X , 0-2*r, h-1+2*r, 0-2*r, w1-1+2*r);
+
+    //PUTS("zero T");
+    free_ui8matrix(T_basic                        , 0-1*r, h-1+1*r, 0-1*r, w1-1+1*r);
+    free_ui8matrix(T_pipeline                     , 0-1*r, h-1+1*r, 0-1*r, w1-1+1*r);
+    free_ui8matrix(T_pipeline_red                 , 0-1*r, h-1+1*r, 0-1*r, w1-1+1*r);
+    free_ui8matrix(T_pipeline_ilu3_red            , 0-1*r, h-1+1*r, 0-1*r, w1-1+1*r);
+    free_ui8matrix(T_pipeline_elu2_red            , 0-1*r, h-1+1*r, 0-1*r, w1-1+1*r);
+    free_ui8matrix(T_pipeline_elu2_red_factor     , 0-1*r, h-1+1*r, 0-1*r, w1-1+1*r);
+    free_ui8matrix(T_pipeline_ilu3_elu2_red       , 0-1*r, h-1+1*r, 0-1*r, w1-1+1*r);
+    free_ui8matrix(T_pipeline_ilu3_elu2_red_factor, 0-1*r, h-1+1*r, 0-1*r, w1-1+1*r);
+
+  //PUTS("zero Y");
+    free_ui8matrix(Y_basic                      , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
+    free_ui8matrix(Y_fusion                     , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
+    free_ui8matrix(Y_fusion_ilu5_red            , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
+    free_ui8matrix(Y_fusion_ilu5_elu2_red       , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
+    free_ui8matrix(Y_fusion_ilu5_elu2_red_factor, 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
+    free_ui8matrix(Y_fusion_ilu15_red           , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
+
+    free_ui8matrix(Y_pipeline                     , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
+    free_ui8matrix(Y_pipeline_red                 , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
+    free_ui8matrix(Y_pipeline_ilu3_red            , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
+    free_ui8matrix(Y_pipeline_elu2_red            , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
+    free_ui8matrix(Y_pipeline_elu2_red_factor     , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
+    free_ui8matrix(Y_pipeline_ilu3_elu2_red       , 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
+    free_ui8matrix(Y_pipeline_ilu3_elu2_red_factor, 0-0*r, h-1+0*r, 0-0*r, w1-1+0*r);
+
+
+
 
 
 }
@@ -1111,17 +1161,19 @@ int test_morpho(int argc, char* argv[])
 {
     // puts("=== test_morpho ===");
     // puts("=== test_morpho max ===");
-    // test_morpho_max();
+    test_morpho_max();
     // puts("=== test_morpho min ===");
-    // test_morpho_min(); //validés
-    // test_morpho_ouverture();
+    test_morpho_min(); //validés
+    test_morpho_ouverture();
 
-    // bench_morpho_ouverture(128, 512, 8);
-    bench_morpho_ouverture(128, 1024, 8);
+    bench_morpho_ouverture(128, 512, 8);
+    // bench_morpho_ouverture(128, 1024, 8);
+    // bench_morpho_ouverture(128, 2048, 8);
 
 
-    //test_set_str();
-    //test_wikipedia();
+
+    // test_set_str();
+    test_wikipedia();
 
   return 0;
 }

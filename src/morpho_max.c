@@ -268,8 +268,9 @@ void line_max3_ui8matrix_ilu3_red(uint8 **X, int i, int j0, int j1, uint8 **Y)
 
   }
   //printf("j= %d, j1=%d\n", j, j1);
-  for (int r = j1-reste+1 ; r<= j1; r++){
-    line_max3_ui8matrix_red(X, i, j1-r+1, j1, Y);
+  // for (int r = j1-reste+1 ; r<= j1; r++){
+  if (reste){
+    line_max3_ui8matrix_red(X, i, j1-reste+1, j1, Y);
   }
 }
 // ---------------------------------------------------------------------------
@@ -483,9 +484,10 @@ void line_max3_ui8matrix_ilu3_elu2_red(uint8 **X, int i, int j0, int j1, uint8 *
 
   }
 
-  for (int r=j1-reste+1; r<=j1; r++){
+  // for (int r=j1-reste+1; r<=j1; r++){
+  if (reste){
     for (int l= 0; l<eluX; l++){
-      line_max3_ui8matrix_red(X, i+l, j1-r+1, j1, Y);
+      line_max3_ui8matrix_red(X, i+l, j1-reste+1, j1, Y);
     }
   }
 }
@@ -585,9 +587,10 @@ void line_max3_ui8matrix_ilu3_elu2_red_factor(uint8 **X, int i, int j0, int j1, 
 
   }
 
-  for (int r=j1-reste+1; r<=j1; r++){
+  // for (int r=j1-reste+1; r<=j1; r++){
+  if (reste){
     for (int l= 0; l<eluX; l++){
-      line_max3_ui8matrix_red(X, i+l, j1-r+1, j1, Y);
+      line_max3_ui8matrix_red(X, i+l, j1-reste+1, j1, Y);
     }
   }
 }

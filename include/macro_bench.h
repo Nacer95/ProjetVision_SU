@@ -29,7 +29,27 @@ extern "C" {
      }                                \
    }                                  \
    cpp = tmin / (n * n);              \
- } while (0)
+ } while (0)                          
+
+ #define BENCH_HxW(X, h, w, cpp)  do { \
+   double t0, t1, dt, tmin = 1e20;     \
+   int run = 4;                        \
+   int iter = 2 ;                      \
+   for (int r = 0; r < run; r++) {     \
+      t0 = _rdtsc();                   \
+      for (int k = 0; k < iter; k++) { \
+         X;                            \
+      }                                \
+      t1 = _rdtsc();                   \
+      dt = t1 - t0;                    \
+      dt /= (double) iter;             \
+      if (dt < tmin) {                 \
+         tmin = dt;                    \
+      }                                \
+    }                                  \
+    cpp = tmin / (h * w);              \
+  } while (0)
+
 
  #define BENCH_secondes(X, n, s)  do {          \
    double  dt, tmin = 1e20;                     \

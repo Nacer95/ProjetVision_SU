@@ -94,7 +94,6 @@ void SigmaDelta_1Step_line_oneFor(uint8 *I, uint8 *M, uint8 *O, uint8 *V, uint8 
   Determiner si un pixel est en mouvement ou pas ici E(X) = {0, 1}
 */
 {
-
   for(int j=j0; j<=j1; j++){
 
     if (M[j] < I[j] ){ M[j]+= 1; }
@@ -111,6 +110,49 @@ void SigmaDelta_1Step_line_oneFor(uint8 *I, uint8 *M, uint8 *O, uint8 *V, uint8 
 
     if (O[j] < V[j] )  {  E[j] = 0;  }
     else {  E[j] = 1;  }
+  }
+
+}
+// ------------------------------------------------------------------------------------------------
+void SigmaDelta_1Step_line_oneFor_reg(uint8 *I, uint8 *M, uint8 *O, uint8 *V, uint8 *E, int k, int j0, int j1)
+// ------------------------------------------------------------------------------------------------
+/*
+  TRAVAIL SUR UNE LIGNE
+  Mettre à jours la moyenne et la variance de chaque pixel d'une ligne
+  Determiner si un pixel est en mouvement ou pas ici E(X) = {0, 1}
+*/
+{
+  for(int j=j0; j<=j1; j++){
+    uint8 ij = I[j];
+    uint8 mj = M[j];
+    uint8 oj = O[j];
+    uint8 vj = V[j];
+
+
+    double k_oj = k*oj;
+
+    if (mj < ij ){ mj+= 1; }
+    if (mj > ij ){ mj-= 1; }
+    else { mj = mj ; }
+
+
+    oj = abs(mj - ij);
+
+    if ( vj < (k_oj) )  {  vj+= 1;  }
+    if ( vj > (k_oj) )  {  vj-= 1;  }
+    else {  vj = vj; }
+
+    vj = MAX(  MIN(vj, SD_VMAX),   SD_VMIN);
+
+    if (oj < vj )  {  E[j] = 0;  }
+    else {  E[j] = 1;  }
+
+    I[j] = ij;
+    M[j] = mj;
+    O[j] = oj;
+    V[j] = vj;
+
+
   }
 
 }
@@ -166,5 +208,22 @@ void SigmaDelta_1Step_oneFor(uint8 **I, uint8 **M, uint8 **O, uint8 **V, uint8 *
   for (int i=i0; i<=i1; i++){
     //fournir les paramètres de la ligne a traitée
     SigmaDelta_1Step_line_oneFor(I[i], M[i], O[i], V[i], E[i], k, j0, j1);
+  }
+}
+
+// ----------------------------------------------------------------------------------------------------------------
+void SigmaDelta_1Step_oneFor_reg(uint8 **I, uint8 **M, uint8 **O, uint8 **V, uint8 **E, int k, int i0, int i1, int j0, int j1)
+// ----------------------------------------------------------------------------------------------------------------
+/*
+  TRAVAIL SUR TOUTE UNE IMAGE = MATRICE
+  Condition pour appeler la fonction SigmaDelta_1Step:
+    - La fonction SigmaDelta_Step0 est appelée avant
+    - La matrice I à subit un changement
+*/
+{
+  // L'image est traitée ligne par ligne
+  for (int i=i0; i<=i1; i++){
+    //fournir les paramètres de la ligne a traitée
+    SigmaDelta_1Step_line_oneFor_reg(I[i], M[i], O[i], V[i], E[i], k, j0, j1);
   }
 }

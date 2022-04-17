@@ -11,7 +11,8 @@ dict_focntion = {
     'pipeline': ["basic","pipeline_basic","pipeline_red","pipeline_ilu3_red",
                  "pipeline_elu2_red","pipeline_elu2_red_factor","pipeline_ilu3_elu2_red","pipeline_ilu3_elu2_red_factor"],
     'swp_max': ["max_basic","SWP_max_rot_uint8","SWP_max_rot_uint16","SWP_max_rot_uint32"],
-    'swp_pipeline' : ["ouverture_basic","SWP_pipeline_rot_uint8","fusion_ilu5_elu2_red_factor","pipeline_elu2_red_factor"]
+    'swp_pipeline' : ["ouverture_basic","SWP_pipeline_rot_uint8","fusion_ilu5_elu2_red_factor","pipeline_ilu3_elu2"],
+    'best_ouverture' : ["min_max_elu3_ilu2_red_factor","fusion_ilu5_elu2_red_factor","pipeline_ilu3_elu2"]
 
 }
 
@@ -46,7 +47,7 @@ M = np.loadtxt(nomFic)
 # ---------------------------------------------
 # ETAPE 3 : DESSINER ET SAUVEGARDER LE DESSIN
 # 3.1. on dessine le nuage de points
-for i in range(2, M.shape[1]):
+for i in range(1, M.shape[1]):
     plt.scatter(M[:, 0], M[:, i], s=5, label=dict_focntion[sys.argv[3]][i - 1])
 
 plt.title(sys.argv[2])

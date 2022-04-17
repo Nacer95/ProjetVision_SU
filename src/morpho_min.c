@@ -216,8 +216,9 @@ void line_min3_ui8matrix_ilu3(uint8 **X, int i, int j0, int j1, uint8 **Y)
     store2(Y, i, j_tmp, m);
 
   }
-  for (int r = j1-reste+1 ; r<= j1; r++){
-    line_min3_ui8matrix_basic(X, i, j1-r+1, j1, Y);
+  // for (int r = j1-reste+1 ; r<= j1; r++){
+  if (reste){
+    line_min3_ui8matrix_basic(X, i, j1-reste+1, j1, Y);
   }
 
 }
@@ -283,8 +284,9 @@ enregistrer la valeur des colonne sans les recalculer
 
   }
   //printf("j= %d, j1=%d\n", j, j1);
-  for (int r = j1-reste+1 ; r<= j1; r++){
-    line_min3_ui8matrix_basic(X, i, j1-r+1, j1, Y);
+  // for (int r = j1-reste+1 ; r<= j1; r++){
+  if (reste ){
+    line_min3_ui8matrix_basic(X, i, j1-reste+1, j1, Y);
   }
 }
 // ---------------------------------------------------------------------------
@@ -506,9 +508,10 @@ void line_min3_ui8matrix_ilu3_elu2_red(uint8 **X, int i, int j0, int j1, uint8 *
 
   }
 
-  for (int r=j1-reste+1; r<=j1; r++){
+  // for (int r=j1-reste+1; r<=j1; r++){
+  if (reste){
     for (int l= 0; l<eluX; l++){
-      line_min3_ui8matrix_basic(X, i+l, j1-r+1, j1, Y);
+      line_min3_ui8matrix_basic(X, i+l, j1-reste+1, j1, Y);
     }
   }
 }
@@ -609,9 +612,10 @@ void line_min3_ui8matrix_ilu3_elu2_red_factor(uint8 **X, int i, int j0, int j1, 
 
   }
 
-  for (int r=j1-reste+1; r<=j1; r++){
+  // for (int r=j1-reste+1; r<=j1; r++){
+  if (reste){
     for (int l= 0; l<eluX; l++){
-      line_min3_ui8matrix_basic(X, i+l, j1-r+1, j1, Y);
+      line_min3_ui8matrix_basic(X, i+l, j1-reste+1, j1, Y);
     }
   }
 }
