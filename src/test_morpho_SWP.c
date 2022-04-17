@@ -75,7 +75,7 @@ void test_morpho_SWP_max_routine(int h, int w0){
   // char * line_de_commande_pipeline  = "python3 graphique.py bench_resultats/bench_SWP_max_tableau.txt cyclePpoint_selon_la_taille_des_images_SWPMAX_Dilatation";
 
   uint8 **X;
-  uint8 **X8, **X1;
+  uint8 **X1;
   uint8 **Y_basic;
   uint8 **Y8_rotation, **Y8_rotation_unpack, **Y16_rotation_unpack, **Y32_rotation_unpack;
   uint16 **Y16_rotation;
@@ -97,7 +97,7 @@ void test_morpho_SWP_max_routine(int h, int w0){
   //Allocation des matrices ====================================================
   // X 2r-border
   X      = ui8matrix(0-2*r, h-1+2*r, 0-2*r, w1_8-1+2*r);//taille multiple de 8
-  X8     = ui8matrix(0-2*r, h-1+2*r, 0-1*r, w1_8-1+1*r);//taille matrice compacté
+  // X8     = ui8matrix(0-2*r, h-1+2*r, 0-1*r, w1_8-1+1*r);//taille matrice compacté
 
 
   // T 1r-border
@@ -138,16 +138,26 @@ void test_morpho_SWP_max_routine(int h, int w0){
   //appel des fonctions
   // pack_ui8matrix(X, h, w1_8, X8);
   max3_ui8matrix_basic(X, 0, h-1, 0, w0-1, Y_basic);
-  max3_ui8matrix_swp_rotation (X, h, w1_8, 0, h-1, 0, w8-1,  Y8_rotation,   Y8_rotation_unpack);
-  max3_ui16matrix_swp_rotation(X, h, w1_8, 0, h-1, 0, w16-1, Y16_rotation,  Y16_rotation_unpack);
-  max3_ui32matrix_swp_rotation(X, h, w1_8, 0, h-1, 0, w32-1, Y32_rotation,  Y32_rotation_unpack);
 
-  // max3_ui8matrix_swp_rotation_trivial (X8, h, w1_8, 0, h-1, 0, w8-1,  Y8_rotation );
-  // max3_ui16matrix_swp_rotation_trivial(X8, h, w1_8, 0, h-1, 0, w16-1, Y16_rotation);
-  // max3_ui32matrix_swp_rotation_trivial(X8, h, w1_8, 0, h-1, 0, w32-1, Y32_rotation);
-  // unpack_ui8matrix  (Y8_rotation   , h, w8,  Y8_rotation_unpack);
-  // unpack_ui16matrix (Y16_rotation  , h, w16, Y16_rotation_unpack);
-  // unpack_ui32matrix (Y32_rotation  , h, w32, Y32_rotation_unpack);
+  // max3_ui8matrix_swp_rotation (X, h, w1_8, 0, h-1, 0, w8-1,  Y8_rotation,   Y8_rotation_unpack);
+  // max3_ui16matrix_swp_rotation(X, h, w1_8, 0, h-1, 0, w16-1, Y16_rotation,  Y16_rotation_unpack);
+  // max3_ui32matrix_swp_rotation(X, h, w1_8, 0, h-1, 0, w32-1, Y32_rotation,  Y32_rotation_unpack);
+
+  uint8 **X8    = ui8matrix (0-1*r, h-1+1*r, 0-1*r, w8-1+1*r);
+  uint16 **X16  = ui16matrix(0-1*r, h-1+1*r, 0-1*r, w16-1+1*r);
+  uint32 **X32  = ui32matrix(0-1*r, h-1+1*r, 0-1*r, w32-1+1*r);
+
+  pack_ui8matrix (X, h, w1_8, X8);
+  pack_ui16matrix(X, h, w1_8, X16);
+  pack_ui32matrix(X, h, w1_8, X32);
+
+  max3_ui8matrix_swp_rotation_trivial (X8,  h, w1_8, 0, h-1, 0, w8-1 , Y8_rotation );
+  max3_ui16matrix_swp_rotation_trivial(X16, h, w1_8, 0, h-1, 0, w16-1, Y16_rotation);
+  max3_ui32matrix_swp_rotation_trivial(X32, h, w1_8, 0, h-1, 0, w32-1, Y32_rotation);
+
+  unpack_ui8matrix  (Y8_rotation   , h, w8,  Y8_rotation_unpack);
+  unpack_ui16matrix (Y16_rotation  , h, w16, Y16_rotation_unpack);
+  unpack_ui32matrix (Y32_rotation  , h, w32, Y32_rotation_unpack);
 
 
 
@@ -190,7 +200,7 @@ void test_morpho_SWP_min_routine(int h, int w0){
   //if(w1 > w0) puts("w1 > w0");
 
   uint8 **X;
-  uint8 **X8, **X1;
+  uint8 **X1;
   uint8 **Y_basic;
   uint8 **Y8_rotation, **Y8_rotation_unpack, **Y16_rotation_unpack, **Y32_rotation_unpack;
   uint16 **Y16_rotation;
@@ -212,7 +222,7 @@ void test_morpho_SWP_min_routine(int h, int w0){
   //Allocation des matrices ====================================================
   // X 2r-border
   X      = ui8matrix(0-2*r, h-1+2*r, 0-2*r, w1_8-1+2*r);//taille multiple de 8
-  X8     = ui8matrix(0-2*r, h-1+2*r, 0-1*r, w1_8-1+1*r);//taille matrice compacté
+  // X8     = ui8matrix(0-2*r, h-1+2*r, 0-1*r, w1_8-1+1*r);//taille matrice compacté
 
 
   // T 1r-border
@@ -247,23 +257,38 @@ void test_morpho_SWP_min_routine(int h, int w0){
 
   //faire un random pour la matrice X ==========================================
   rand1_ui8matrix(X, 0, h-1, 0, w0-1, 80);
-  rand1_ui8matrix(X, 0, h-1, 0, w0-1, 20); // binaire [0,1] (afin d'avoir des '1' apres traitement et pas que des '0');
+  rand1_ui8matrix(X, 0, h-1, 0, w0-1, 80); // binaire [0,1] (afin d'avoir des '1' apres traitement et pas que des '0');
   //display_ui8matrix (X,  0-2*r, h-1+2*r, 0-2*r, w1-1+2*r, format1, "X0");
 
   //appel des fonctions
   //pack_ui8matrix(X, h, w1, Y8_rotation);
   min3_ui8matrix_basic(X, 0, h-1, 0, w0-1, Y_basic);
-  min3_ui8matrix_swp_rotation (X, h, w1_8, 0, h-1, 0, w8-1,  Y8_rotation,   Y8_rotation_unpack);
-  min3_ui16matrix_swp_rotation(X, h, w1_8, 0, h-1, 0, w16-1, Y16_rotation,  Y16_rotation_unpack);
-  min3_ui32matrix_swp_rotation(X, h, w1_8, 0, h-1, 0, w32-1, Y32_rotation,  Y32_rotation_unpack);
+  // min3_ui8matrix_swp_rotation (X, h, w1_8, 0, h-1, 0, w8-1,  Y8_rotation,   Y8_rotation_unpack);
+  // min3_ui16matrix_swp_rotation(X, h, w1_8, 0, h-1, 0, w16-1, Y16_rotation,  Y16_rotation_unpack);
+  // min3_ui32matrix_swp_rotation(X, h, w1_8, 0, h-1, 0, w32-1, Y32_rotation,  Y32_rotation_unpack);
 
+  uint8 **X8    = ui8matrix (0-1*r, h-1+1*r, 0-1*r, w8-1+1*r);
+  uint16 **X16  = ui16matrix(0-1*r, h-1+1*r, 0-1*r, w16-1+1*r);
+  uint32 **X32  = ui32matrix(0-1*r, h-1+1*r, 0-1*r, w32-1+1*r);
+  //
+  pack_ui8matrix (X, h, w1_8, X8);
+  pack_ui16matrix(X, h, w1_8, X16);
+  pack_ui32matrix(X, h, w1_8, X32);
+  //
+  min3_ui8matrix_swp_rotation_trivial (X8,  h, w1_8, 0, h-1, 0, w8-1 , Y8_rotation );
+  min3_ui16matrix_swp_rotation_trivial(X16, h, w1_8, 0, h-1, 0, w16-1, Y16_rotation);
+  min3_ui32matrix_swp_rotation_trivial(X32, h, w1_8, 0, h-1, 0, w32-1, Y32_rotation);
+  //
+  unpack_ui8matrix  (Y8_rotation   , h, w8,  Y8_rotation_unpack);
+  unpack_ui16matrix (Y16_rotation  , h, w16, Y16_rotation_unpack);
+  unpack_ui32matrix (Y32_rotation  , h, w32, Y32_rotation_unpack);
 
 
   //display
-  //display_ui8matrix(X                               ,  0, h-1, 0, w0-1, format8, "X                                  ");
-  // display_ui8matrix(Y_basic                                 ,  0, h-1, 0, w0-1, format8, "Y_basic                            ");
-  //display_ui8matrix(Y8_rotation_unpack                      ,  0, h-1, 0, w0-1, format8, "Y8_rotation_unpack                         ");
-  // display_ui8matrix(Y16_rotation_unpack                      ,  0, h-1, 0, w0-1, format8, "Y16_rotation_unpack                         ");
+  //display_ui8matrix(X                                        ,  0, h-1, 0, w0-1, format8, "X                                  ");
+  // display_ui8matrix(Y_basic                                 ,  0, h-1, 0, w0-1, format8, "Y_basic                             ");
+  //display_ui8matrix(Y8_rotation_unpack                       ,  0, h-1, 0, w0-1, format8, "Y8_rotation_unpack                  ");
+  // display_ui8matrix(Y16_rotation_unpack                     ,  0, h-1, 0, w0-1, format8, "Y16_rotation_unpack                 ");
 
 
   //compare
@@ -297,7 +322,7 @@ void test_morpho_SWP_ouverture_routine(int h, int w0){
   //if(w1 > w0) puts("w1 > w0");
 
   uint8 **X;
-  uint8 **X8, **X1;
+  uint8 **X1, **X8;
   uint8 **Y_basic, **T_basic, **T8_rotation;
   uint8 **Y8_rotation, **Y16_rotation_unpack, **Y32_rotation_unpack;
   uint8 **Y8_rotation_unpack_erosion, **Y8_rotation_unpack_ouverture ;
@@ -320,8 +345,9 @@ void test_morpho_SWP_ouverture_routine(int h, int w0){
   //puts("malloc");
   //Allocation des matrices ====================================================
   // X 2r-border
-  X      = ui8matrix(0-2*r, h-1+2*r, 0-2*r, w1_8-1+2*r);//taille multiple de 8
-  X8     = ui8matrix(0-2*r, h-1+2*r, 0-1*r, w1_8-1+1*r);//taille matrice compacté
+  X      = ui8matrix(0-2*r, h-1+2*r, 0-2*r, w1_8-1+2*r);
+  X8     = ui8matrix (0-2*r, h-1+2*r, 0-2*r,  w8-1+2*r);//taille multiple de 8
+  // X8     = ui8matrix(0-2*r, h-1+2*r, 0-1*r, w1_8-1+1*r);//taille matrice compacté
 
 
   // T 1r-border compact
@@ -370,25 +396,21 @@ void test_morpho_SWP_ouverture_routine(int h, int w0){
   //display_ui8matrix (X,  0-2*r, h-1+2*r, 0-2*r, w1-1+2*r, format1, "X0");
 
   //appel des fonctions ========================================== ==========================================
-  //pack_ui8matrix(X, h, w1_8, Y8_rotation);
+  pack_ui8matrix(X, h, w1_8, X8);
   ouverture3_ui8matrix_basic(X, 0, h-1, 0, w0-1, T_basic,  Y_basic);
-  // ouverture3_ui8matrix_SWP_basic(X, h, w1_8, 0, h-1, 0, w8-1, Y8_rotation_unpack_erosion, Y8_rotation_unpack_ouverture);
-  ouverture3_ui8matrix_pipeline_SWP_rotation(X, h, w1_8, 0, h-1, 0, w8-1, T8_rotation, Y8_rotation, Y8_rotation_unpack_erosion, Y8_rotation_unpack_ouverture);
 
-  // min3_ui8matrix_swp_rotation (X, h, w1_8, -1, h, -1, w8,  T8_rotation,   Y8_rotation_unpack_erosion);
-  // max3_ui8matrix_swp_rotation (Y8_rotation_unpack_erosion, h, w1_8, 0, h-1, 0, w8-1,  Y8_rotation,   Y8_rotation_unpack_ouverture);
-  // max3_ui8matrix_basic(X, 0, h-1, 0, w0-1, Y_basic);
-  // min3_ui8matrix_basic(X, -1, h, -1, w0, T_basic);
-  // ouverture3_ui8matrix_SWP_basic(X, h, w1_8, 0, h-1, 0, w8-1, T8_rotation, Y8_rotation, Y8_rotation_unpack_erosion, Y8_rotation_unpack_ouverture);
+  ouverture3_ui8matrix_pipeline_SWP_rotation_trivial(X8, h, w8, 0, h-1, 0, w8-1, T8_rotation, Y8_rotation);
+
+  unpack_ui8matrix (T8_rotation , h, w8, Y8_rotation_unpack_erosion);
+  unpack_ui8matrix (Y8_rotation , h, w8, Y8_rotation_unpack_ouverture);
 
 
-
- //========================================== ========================================== ==========================================
+ //=========================================
   //display
   //display_ui8matrix(X                                        ,  0, h-1, 0, w0-1, format8, "X                                  ");
   //display_ui8matrix(Y_basic                                  ,  0, h-1, 0, w0-1, format8, "Y_basic                            ");
-  //display_ui8matrix(Y8_rotation_unpack                       ,  0, h-1, 0, w0-1, format8, "Y8_rotation_unpack                         ");
-  //display_ui8matrix(Y16_rotation_unpack                      ,  0, h-1, 0, w0-1, format8, "Y16_rotation_unpack                         ");
+  //display_ui8matrix(Y8_rotation_unpack                       ,  0, h-1, 0, w0-1, format8, "Y8_rotation_unpack                 ");
+  //display_ui8matrix(Y16_rotation_unpack                      ,  0, h-1, 0, w0-1, format8, "Y16_rotation_unpack                ");
 
 
   //compare T
@@ -403,6 +425,7 @@ void test_morpho_SWP_ouverture_routine(int h, int w0){
   //free
   //free_ui8matrix(Y_rotation,                        0-1*r, h-1+1*r, 0-1*r, w1-1+1*r);
 }
+
 
 
 
@@ -467,9 +490,9 @@ void test_morpho_SWP_ouverture(void){
 
 int test_swp(int argc, char* argv[]){
   test_morpho_SWP_max();
-  // test_morpho_SWP_min();
-  //
-  // test_morpho_SWP_ouverture();
+  test_morpho_SWP_min();
+
+  test_morpho_SWP_ouverture();
 
   return 0;
 }

@@ -180,7 +180,7 @@
        line_max3_ui8matrix_swp_rotation(T8, i, j0, j1, Z8);
      }
      unpack_ui8matrix (Z8 , h, w8, Y);
-     
+
  }
  // -------------------------------------------------------------------------------
  void max3_ui8matrix_swp_rotation_trivial(uint8 **X8, int h, int w, int i0, int i1, int j0, int j1, uint8 **Z8)

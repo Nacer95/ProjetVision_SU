@@ -85,6 +85,35 @@ void SigmaDelta_1Step_line(uint8 *I, uint8 *M, uint8 *O, uint8 *V, uint8 *E, int
 
 }
 // ---------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
+void SigmaDelta_1Step_line_oneFor(uint8 *I, uint8 *M, uint8 *O, uint8 *V, uint8 *E, int k, int j0, int j1)
+// ------------------------------------------------------------------------------------------------
+/*
+  TRAVAIL SUR UNE LIGNE
+  Mettre à jours la moyenne et la variance de chaque pixel d'une ligne
+  Determiner si un pixel est en mouvement ou pas ici E(X) = {0, 1}
+*/
+{
+
+  for(int j=j0; j<=j1; j++){
+
+    if (M[j] < I[j] ){ M[j]+= 1; }
+    if (M[j] > I[j] ){ M[j]-= 1; }
+    else { M[j] = M[j] ; }
+
+    O[j] = abs(M[j] - I[j]);
+
+    if ( V[j] < (k*O[j]) )  {  V[j]+= 1;  }
+    if ( V[j] > (k*O[j]) )  {  V[j]-= 1;  }
+    else {  V[j] = V[j]; }
+
+    V[j] = MAX(  MIN(V[j], SD_VMAX),   SD_VMIN);
+
+    if (O[j] < V[j] )  {  E[j] = 0;  }
+    else {  E[j] = 1;  }
+  }
+
+}
 void SigmaDelta_Step0(uint8 **I, uint8 **M, uint8 **O, uint8 **V, uint8 **E, int i0, int i1, int j0, int j1)
 // ---------------------------------------------------------------------------------------------------------
 {
@@ -121,5 +150,21 @@ void SigmaDelta_1Step(uint8 **I, uint8 **M, uint8 **O, uint8 **V, uint8 **E, int
   for (int i=i0; i<=i1; i++){
     //fournir les paramètres de la ligne a traitée
     SigmaDelta_1Step_line(I[i], M[i], O[i], V[i], E[i], k, j0, j1);
+  }
+}
+// ----------------------------------------------------------------------------------------------------------------
+void SigmaDelta_1Step_oneFor(uint8 **I, uint8 **M, uint8 **O, uint8 **V, uint8 **E, int k, int i0, int i1, int j0, int j1)
+// ----------------------------------------------------------------------------------------------------------------
+/*
+  TRAVAIL SUR TOUTE UNE IMAGE = MATRICE
+  Condition pour appeler la fonction SigmaDelta_1Step:
+    - La fonction SigmaDelta_Step0 est appelée avant
+    - La matrice I à subit un changement
+*/
+{
+  // L'image est traitée ligne par ligne
+  for (int i=i0; i<=i1; i++){
+    //fournir les paramètres de la ligne a traitée
+    SigmaDelta_1Step_line_oneFor(I[i], M[i], O[i], V[i], E[i], k, j0, j1);
   }
 }

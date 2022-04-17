@@ -59,6 +59,28 @@ void ouverture3_ui8matrix_SWP_basic(uint8 **X, int h, int w, int i0, int i1, int
 
 }
 
+
+
+void ouverture3_ui8matrix_pipeline_SWP_rotation_trivial(uint8 **X8, int h, int w, int i0, int i1, int j0, int j1, uint8 **T8, uint8 **Y8)
+// ------------------------------------------------------------------------------------------------------
+
+{
+
+  line_min3_ui8matrix_swp_rotation(X8, i0, j0, j1, T8);
+  line_min3_ui8matrix_swp_rotation(X8, i0, j0, j1, T8);
+
+  for (int i=i0; i<=i1; i++){
+
+    line_min3_ui8matrix_swp_rotation(X8, i+1, j0, j1,  T8);
+    line_max3_ui8matrix_swp_rotation(T8, i,   j0, j1,  Y8);
+  }
+  //unpack
+  //unpack
+  // unpack_ui8matrix (T8 , h, w8, Z);
+  // unpack_ui8matrix (Y8 , h, w8, Y);
+
+}
+
 void ouverture3_ui8matrix_pipeline_SWP_rotation(uint8 **X, int h, int w, int i0, int i1, int j0, int j1, uint8 **T8, uint8 **Y8, uint8 **Z, uint8 **Y)
 // ------------------------------------------------------------------------------------------------------
 /*
@@ -71,21 +93,19 @@ void ouverture3_ui8matrix_pipeline_SWP_rotation(uint8 **X, int h, int w, int i0,
   // pack
   int r = 2;
   int w8 = j1+1;
-  uint8 **T8_rotation  = ui8matrix (0-1*r, h-1+1*r, 0-1*r,  w8-1+1*r);
-  uint8 **Y8_rotation  = ui8matrix (0-1*r, h-1+1*r, 0-1*r,  w8-1+1*r);
   uint8 **X8           = ui8matrix (0-1*r, h-1+1*r, 0-1*r,  w8-1+1*r);
   pack_ui8matrix(X, h, w, X8);
 
-  line_min3_ui8matrix_swp_rotation(X8, i0, j0, j1, T8_rotation);
-  line_min3_ui8matrix_swp_rotation(X8, i0, j0, j1, T8_rotation);
+  line_min3_ui8matrix_swp_rotation(X8, i0, j0, j1, T8);
+  line_min3_ui8matrix_swp_rotation(X8, i0, j0, j1, T8);
 
   for (int i=i0; i<=i1; i++){
-    line_min3_ui8matrix_swp_rotation(X8, i+1, j0, j1,  T8_rotation);
-    line_max3_ui8matrix_swp_rotation(T8_rotation, i,   j0, j1,  Y8_rotation);
+    line_min3_ui8matrix_swp_rotation(X8, i+1, j0, j1,  T8);
+    line_max3_ui8matrix_swp_rotation(T8, i,   j0, j1,  Y8);
   }
   //unpack
-  unpack_ui8matrix (T8_rotation , h, w8, Z);
-  unpack_ui8matrix (Y8_rotation , h, w8, Y);
+  unpack_ui8matrix (T8 , h, w8, Z);
+  unpack_ui8matrix (Y8 , h, w8, Y);
 
 
 

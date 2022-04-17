@@ -14,6 +14,10 @@
 #include "sigmadelta.h"
 #include "morpho_min.h"
 #include "morpho_max.h"
+#include "morpho_SWP_max.h"
+#include "morpho_SWP_min.h"
+#include "swp.h"
+
 #include "motion.h"
 
 // -------------------------------------------------------
@@ -123,6 +127,13 @@ void motion_detection_morpho_v1(void)
 
     // sigma-delta
     uint8 **I, **M, **O, **V, **E, **E_8;
+    // fusion ouverture
+    uint8 **Y_basic_ouverture;
+    uint8 **Y_fusion_ouverture;
+    uint8 **Y_fusion_ilu5_red_ouverture;
+    uint8 **Y_fusion_ilu5_elu2_red_ouverture;
+    uint8 **Y_fusion_ilu5_elu2_red_factor_ouverture;
+    uint8 **Y_fusion_ilu15_red_ouverture;
 
     // morpho
     uint8 **Erosion1, **Dilatation1, **Dilatation2, **Erosion2;
@@ -143,9 +154,13 @@ void motion_detection_morpho_v1(void)
     // -------
     // -- init
     // -------
-    puts("[motion_detection_morpho_v1]: les parametres de la sequence sont dans motion.h");
-    puts("[motion_detection_morpho_v1]: supprimer ce message une fois les parametres configures");
-    puts("[motion_detection_morpho_v1]: bye...");
+    // puts("[motion_detection_morpho_v1]: les parametres de la sequence sont dans motion.h");
+    // puts("[motion_detection_morpho_v1]: supprimer ce message une fois les parametres configures");
+    // puts("[motion_detection_morpho_v1]: bye...");
+
+    puts("swp: test...");
+
+
     //return;
 
     src_path = SEQUENCE_SRC_PATH;
@@ -162,6 +177,12 @@ void motion_detection_morpho_v1(void)
     dst_path = SEQUENCE_DST_PATH;
 
     i0 = 0; i1 = h-1; j0 = 0; j1 = w-1;
+    // int w8  = w / 8 ; if(w % 8)  {w8 = w8+1 ;  j1 =  8*w8 ;}
+    // int w16 = w / 16; if(w % 16) {w16 = w16+1; j1 = 16*w16;}
+    int w32 = w / 32; if(w % 32) {w32 = w32+1; j1 = 32*w32;}
+
+
+
 
     // ----------------
     // -- allocation --
@@ -208,6 +229,69 @@ void motion_detection_morpho_v1(void)
     zero_ui8matrix(Dilatation1_8, i0, i1, j0, j1);
     zero_ui8matrix(Dilatation2_8, i0, i1, j0, j1);
 
+
+    puts("============================================");
+    puts("==    bench_morpho_SWP_max allocation    ===");
+    puts("============================================");
+
+    int r = 1;
+    //swp8
+    // int w1_8  =  8 *  w8 ;
+    // uint8 **Y8_erosion1, **Y8_dilatation1, **Y8_dilatation2, **Y8_erosion2;
+    // uint8 **Y8_erosion1_unpack, **Y8_dilatation1_unpack, **Y8_dilatation2_unpack, **Y8_erosion2_unpack;
+
+    //swp16
+    // int w1_16 = 16 * w16 ;
+    // uint16 **Y16_erosion1, **Y16_dilatation1, **Y16_dilatation2, **Y16_erosion2;
+    // uint16 **Y16_erosion1_unpack, **Y16_dilatation1_unpack, **Y16_dilatation2_unpack, **Y16_erosion2_unpack;
+
+    // swp32
+    int w1_32 = 32 * w32 ;
+    uint32 **Y32_erosion1, **Y32_dilatation1, **Y32_dilatation2, **Y32_erosion2;
+    uint32 **Y32_erosion1_unpack, **Y32_dilatation1_unpack, **Y32_dilatation2_unpack, **Y32_erosion2_unpack;
+
+
+
+    // swp 8 ========================================================================
+    // uint8  **X8   = ui8matrix (0-2*r, h-1+2*r, 0-2*r, w8-1+2*r);
+    // Y8_erosion1                       = ui8matrix (0-2*r, h-1+2*r, 0-2*r,  w8-1+2*r);
+    // Y8_dilatation1                    = ui8matrix (0-2*r, h-1+2*r, 0-2*r,  w8-1+2*r);
+    // Y8_dilatation2                    = ui8matrix (0-2*r, h-1+2*r, 0-2*r,  w8-1+2*r);
+    // Y8_erosion2                       = ui8matrix (0-2*r, h-1+2*r, 0-2*r,  w8-1+2*r);
+    //
+    // zero_ui8matrix (Y8_erosion1,       0-2*r, h-1+2*r, 0-1*r, w8-1+2*r  );
+    // zero_ui8matrix (Y8_dilatation1,    0-2*r, h-1+2*r, 0-1*r, w8-1+2*r  );
+    // zero_ui8matrix (Y8_dilatation2,    0-2*r, h-1+2*r, 0-1*r, w8-1+2*r  );
+    // zero_ui8matrix (Y8_erosion2,       0-2*r, h-1+2*r, 0-1*r, w8-1+2*r  );
+
+
+    // swp 16 ========================================================================
+    // uint16 **X16  = ui16matrix(0-1*r, h-1+1*r, 0-1*r, w16-1+1*r);
+    //
+    // Y16_erosion1                       = ui16matrix (0-2*r, h-1+2*r, 0-2*r,  w16-1+2*r);
+    // Y16_dilatation1                    = ui16matrix (0-2*r, h-1+2*r, 0-2*r,  w16-1+2*r);
+    // Y16_dilatation2                    = ui16matrix (0-2*r, h-1+2*r, 0-2*r,  w16-1+2*r);
+    // Y16_erosion2                       = ui16matrix (0-2*r, h-1+2*r, 0-2*r,  w16-1+2*r);
+    //
+    // zero_ui16matrix (Y16_erosion1,       0-2*r, h-1+2*r, 0-1*r, w16-1+2*r  );
+    // zero_ui16matrix (Y16_dilatation1,    0-2*r, h-1+2*r, 0-1*r, w16-1+2*r  );
+    // zero_ui16matrix (Y16_dilatation2,    0-2*r, h-1+2*r, 0-1*r, w16-1+2*r  );
+    // zero_ui16matrix (Y16_erosion2,       0-2*r, h-1+2*r, 0-1*r, w16-1+2*r  );
+
+    // swp 32 ========================================================================
+    uint32 **X32  = ui32matrix(0-1*r, h-1+1*r, 0-1*r, w32-1+1*r);
+
+    Y32_erosion1                       = ui32matrix (0-2*r, h-1+2*r, 0-2*r,  w32-1+2*r);
+    Y32_dilatation1                    = ui32matrix (0-2*r, h-1+2*r, 0-2*r,  w32-1+2*r);
+    Y32_dilatation2                    = ui32matrix (0-2*r, h-1+2*r, 0-2*r,  w32-1+2*r);
+    Y32_erosion2                       = ui32matrix (0-2*r, h-1+2*r, 0-2*r,  w32-1+2*r);
+
+    zero_ui32matrix (Y32_erosion1,       0-2*r, h-1+2*r, 0-1*r, w32-1+2*r  );
+    zero_ui32matrix (Y32_dilatation1,    0-2*r, h-1+2*r, 0-1*r, w32-1+2*r  );
+    zero_ui32matrix (Y32_dilatation2,    0-2*r, h-1+2*r, 0-1*r, w32-1+2*r  );
+    zero_ui32matrix (Y32_erosion2,       0-2*r, h-1+2*r, 0-1*r, w32-1+2*r  );
+
+
     // ----------------
     // -- traitement --
     // ----------------
@@ -229,26 +313,57 @@ void motion_detection_morpho_v1(void)
     // -- boucle --
     for(int t=tstart; t<=tstop; t+=tstep) {
 
-        printf("-- i = %3d ----------\n", t);
+        printf("-- i = %3d -------swp---\n", t);
 
         generate_path_filename_k_ndigit_extension(src_path, filename, t, ndigit, "pgm", complete_filename_I);
         MLoadPGM_ui8matrix(complete_filename_I, i0, i1, j0, j1, I); // modification de I
 
         // N = 3 ecart type autour de la moyenne
-        SigmaDelta_1Step(I, M, O, V, E, 3, i0, i1, j0, j1);
+        SigmaDelta_1Step_oneFor(I, M, O, V, E, 3, i0, i1, j0, j1);
 
         // morpho en niveau de gris fonctionnant aussi sur des images 1 bit / pixel
-        min3_ui8matrix_basic(E,           i0, i1, j0, j1, Erosion1);
-        max3_ui8matrix_basic(Erosion1,    i0, i1, j0, j1, Dilatation1);
-        max3_ui8matrix_basic(Dilatation1, i0, i1, j0, j1, Dilatation2);
-        min3_ui8matrix_basic(Dilatation2, i0, i1, j0, j1, Erosion2);
-
+          //basique ============================================================
+        // min3_ui8matrix_basic(E,           i0, i1, j0, w-1, Erosion1);
+        // max3_ui8matrix_basic(Erosion1,    i0, i1, j0, w-1, Dilatation1);
+        // max3_ui8matrix_basic(Dilatation1, i0, i1, j0, w-1, Dilatation2);
+        // min3_ui8matrix_basic(Dilatation2, i0, i1, j0, w-1, Erosion2);
+          //swp 8 ==============================================================
+        // pack_ui8matrix (E, h, w1_8, X8);
+        // min3_ui8matrix_swp_rotation_trivial (X8,              h, w1_8, 0, h-1, 0, w8-1,  Y8_erosion1)    ;
+        // max3_ui8matrix_swp_rotation_trivial (Y8_erosion1,     h, w1_8, 0, h-1, 0, w8-1,  Y8_dilatation1) ;
+        // max3_ui8matrix_swp_rotation_trivial (Y8_dilatation1,  h, w1_8, 0, h-1, 0, w8-1,  Y8_dilatation2) ;
+        // min3_ui8matrix_swp_rotation_trivial (Y8_dilatation2,  h, w1_8, 0, h-1, 0, w8-1,  Y8_erosion2)    ;
+        // unpack_ui8matrix  (Y8_erosion1       , h, w8,  Erosion1);
+        // unpack_ui8matrix  (Y8_dilatation1    , h, w8,  Erosion2);
+        // unpack_ui8matrix  (Y8_dilatation2    , h, w8,  Dilatation1);
+        // unpack_ui8matrix  (Y8_erosion2       , h, w8,  Dilatation2);
+          //swp16 ==============================================================
+        // pack_ui16matrix (E, h, w1_16, X16);
+        // min3_ui16matrix_swp_rotation_trivial (X16,              h, w1_16, 0, h-1, 0, w16-1,  Y16_erosion1)    ;
+        // max3_ui16matrix_swp_rotation_trivial (Y16_erosion1,     h, w1_16, 0, h-1, 0, w16-1,  Y16_dilatation1) ;
+        // max3_ui16matrix_swp_rotation_trivial (Y16_dilatation1,  h, w1_16, 0, h-1, 0, w16-1,  Y16_dilatation2) ;
+        // min3_ui16matrix_swp_rotation_trivial (Y16_dilatation2,  h, w1_16, 0, h-1, 0, w16-1,  Y16_erosion2)    ;
+        // unpack_ui16matrix  (Y16_erosion1       , h, w16,  Erosion1);
+        // unpack_ui16matrix  (Y16_dilatation1    , h, w16,  Erosion2);
+        // unpack_ui16matrix  (Y16_dilatation2    , h, w16,  Dilatation1);
+        // unpack_ui16matrix  (Y16_erosion2       , h, w16,  Dilatation2);
+          //swp32 ==============================================================
+        pack_ui32matrix (E, h, w1_32, X32);
+        max3_ui32matrix_swp_rotation_trivial (X32,              h, w1_32, 0, h-1, 0, w32-1,  Y32_erosion1)    ;
+        min3_ui32matrix_swp_rotation_trivial (Y32_erosion1,     h, w1_32, 0, h-1, 0, w32-1,  Y32_dilatation1) ;
+        min3_ui32matrix_swp_rotation_trivial (Y32_dilatation1,  h, w1_32, 0, h-1, 0, w32-1,  Y32_dilatation2) ;
+        max3_ui32matrix_swp_rotation_trivial (Y32_dilatation2,  h, w1_32, 0, h-1, 0, w32-1,  Y32_erosion2)    ;
+        unpack_ui32matrix  (Y32_erosion1       , h, w32,  Erosion1);
+        unpack_ui32matrix  (Y32_dilatation1    , h, w32,  Erosion2);
+        unpack_ui32matrix  (Y32_dilatation2    , h, w32,  Dilatation1);
+        unpack_ui32matrix  (Y32_erosion2       , h, w32,  Dilatation2);
+        // =====================================================================
         // traitement pour visualisation
-        threshold_ui8matrix(E,           1, 255, E_8,           i0, i1, j0, j1);
-        threshold_ui8matrix(Erosion1,    1, 255, Erosion1_8,    i0, i1, j0, j1);
-        threshold_ui8matrix(Erosion2,    1, 255, Erosion2_8,    i0, i1, j0, j1);
-        threshold_ui8matrix(Dilatation1, 1, 255, Dilatation1_8, i0, i1, j0, j1);
-        threshold_ui8matrix(Dilatation2, 1, 255, Dilatation1_8, i0, i1, j0, j1);
+        threshold_ui8matrix(E,           1, 255, E_8,           i0, i1, j0, w-1);
+        threshold_ui8matrix(Erosion1,    1, 255, Erosion1_8,    i0, i1, j0, w-1);
+        threshold_ui8matrix(Erosion2,    1, 255, Erosion2_8,    i0, i1, j0, w-1);
+        threshold_ui8matrix(Dilatation1, 1, 255, Dilatation1_8, i0, i1, j0, w-1);
+        threshold_ui8matrix(Dilatation2, 1, 255, Dilatation1_8, i0, i1, j0, w-1);
 
         generate_path_filename_k_ndigit_extension(dst_path, "I_",        t, ndigit, "pgm", complete_filename_I);
         //generate_path_filename_k_ndigit_extension(dst_path, "M_",        t, ndigit, "pgm", complete_filename_M);

@@ -76,8 +76,6 @@
               - Appeler line_min3_ui8matrix_basic pour 9 point
               - Appeler la fonction line_max3_ui8matrix_basic pour 1 point
 */
-
-
 // -------------------------------------------------------------------------------
 void line_ouverture3_ui8matrix_fusion(uint8 **X, int i, int j0, int j1, uint8 **Y)
 // -------------------------------------------------------------------------------

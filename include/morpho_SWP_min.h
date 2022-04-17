@@ -31,6 +31,10 @@ void min3_ui8matrix_swp_rotation (uint8 **X, int h, int w, int i0, int i1, int j
 void min3_ui16matrix_swp_rotation(uint8 **X, int h, int w, int i0, int i1, int j0, int j1, uint16 **Z16, uint8 **Y);
 void min3_ui32matrix_swp_rotation(uint8 **X, int h, int w, int i0, int i1, int j0, int j1, uint32 **Z32, uint8 **Y);
 
+void min3_ui8matrix_swp_rotation_trivial(uint8 **X8, int h, int w, int i0, int i1, int j0, int j1, uint8 **Z8);
+void min3_ui16matrix_swp_rotation_trivial(uint16 **X16, int h, int w, int i0, int i1, int j0, int j1, uint16 **Z16);
+void min3_ui32matrix_swp_rotation_trivial(uint32 **X32, int h, int w, int i0, int i1, int j0, int j1, uint32 **Z32);
+
 #ifdef __cplusplus
 }
 #endif

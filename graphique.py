@@ -4,17 +4,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 dict_focntion = {
-    'max': ["cpp_max_basic", "cpp_max_reg", "cpp_max_rot", "cpp_max_red", "cpp_max_ilu3_red", "cpp_max_elu2_red",
-            "cpp_max_elu2_red_factor", "cpp_max_ilu3_elu2_red", "cpp_max_ilu3_elu2_red_factor"],
-    'fusion': ["cpp_basic", "cpp_fusion", "cpp_fusion_ilu5_red", "cpp_fusion_ilu5_elu2_red",
-               "cpp_fusion_ilu5_elu2_red_factor", "cpp_fusion_ilu15_red"],
-    'pipeline': ["cpp_basic","cpp_pipeline_basic","cpp_pipeline_red","cpp_pipeline_ilu3_red",
-                 "cpp_pipeline_elu2_red","cpp_pipeline_elu2_red_factor","cpp_pipeline_ilu3_elu2_red","cpp_pipeline_ilu3_elu2_red_factor"],
-    'swp_max': ["cpp_max_basic","cpp_SWP_max_rot_uint8","cpp_SWP_max_rot_uint16","cpp_SWP_max_rot_uint32"]
+    'max': ["max_basic", "max_reg", "max_rot", "max_red", "max_ilu3_red", "max_elu2_red",
+            "max_elu2_red_factor", "max_ilu3_elu2_red", "max_ilu3_elu2_red_factor"],
+    'fusion': ["basic", "fusion", "fusion_ilu5_red", "fusion_ilu5_elu2_red",
+               "fusion_ilu5_elu2_red_factor", "fusion_ilu15_red"],
+    'pipeline': ["basic","pipeline_basic","pipeline_red","pipeline_ilu3_red",
+                 "pipeline_elu2_red","pipeline_elu2_red_factor","pipeline_ilu3_elu2_red","pipeline_ilu3_elu2_red_factor"],
+    'swp_max': ["max_basic","SWP_max_rot_uint8","SWP_max_rot_uint16","SWP_max_rot_uint32"],
+    'swp_pipeline' : ["ouverture_basic","SWP_pipeline_rot_uint8","fusion_ilu5_elu2_red_factor","pipeline_elu2_red_factor"]
 
 }
 
-repertoire_GRAPHIQUE = "bench_graphiques/"
+dict_legende = {
+    'cpp': ["dimension image n*n", "cycles/point"],
+    's':   [" dimension image n*n", "temps en seconde"]
+
+}
+
+repertoire_GRAPHIQUE = "bench_graphiques/"+sys.argv[4]+"/"
 # -------------------------------------------------------------------------------------------
 # ETAPE 1 : RECUPERER LE NOM DU FICHIER DE DONNEES PASSE EN ARGUMENT DE LA LIGNE DE COMMANDE
 # 1.1. on verifie qu'on a le bon nombre d'arguments
@@ -39,12 +46,12 @@ M = np.loadtxt(nomFic)
 # ---------------------------------------------
 # ETAPE 3 : DESSINER ET SAUVEGARDER LE DESSIN
 # 3.1. on dessine le nuage de points
-for i in range(1, M.shape[1]):
+for i in range(2, M.shape[1]):
     plt.scatter(M[:, 0], M[:, i], s=5, label=dict_focntion[sys.argv[3]][i - 1])
 
 plt.title(sys.argv[2])
-plt.xlabel("dimension image n*n")
-plt.ylabel("cycles/point")
+plt.xlabel(dict_legende[sys.argv[4]][0])
+plt.ylabel(dict_legende[sys.argv[4]][1])
 plt.legend()
 
 # 3.2. on sauvegarde le dessin en png

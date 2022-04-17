@@ -80,9 +80,9 @@ int main(int argc, char *argv[])
 {
 
     // test_swp(argc, argv);
-    bench_morpho_swp(argc, argv);
+    // bench_morpho_swp(argc, argv);
 
-    //test_morpho(argc, argv);
-    // test_motion(argc, argv);
+     //test_morpho(argc, argv);
+     test_motion(argc, argv);
     return 0;
 }
